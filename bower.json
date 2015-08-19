@@ -1,0 +1,25 @@
+{
+  "name": "customizer-definitely",
+  "version": "0.5.0",
+  "description": "This framework plugin makes adding customizer panels, sections and fields to WordPress very simple, yet flexible. It all works using a single action and an array.",
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "framework",
+    "library",
+    "developer",
+    "customizer",
+    "admin",
+    "backend",
+    "ui"
+  ],
+  "homepage": "http://wordpress.org/plugins/customizer-definitely/",
+  "authors": [
+    {
+      "name": "Felix Arntz",
+      "email": "felix-arntz@leaves-and-love.net",
+      "homepage": "http://leaves-and-love.net"
+    }
+  ],
+  "dependencies": {}
+}

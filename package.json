@@ -1,0 +1,47 @@
+{
+  "name": "customizer-definitely",
+  "version": "0.5.0",
+  "description": "This framework plugin makes adding customizer panels, sections and fields to WordPress very simple, yet flexible. It all works using a single action and an array.",
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "framework",
+    "library",
+    "developer",
+    "customizer",
+    "admin",
+    "backend",
+    "ui"
+  ],
+  "author": {
+    "name": "Felix Arntz",
+    "email": "felix-arntz@leaves-and-love.net",
+    "url": "http://leaves-and-love.net"
+  },
+  "homepage": "http://wordpress.org/plugins/customizer-definitely/",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/felixarntz/customizer-definitely.git"
+  },
+  "bugs": {
+    "url" : "https://github.com/felixarntz/customizer-definitely/issues"
+  },
+  "license": {
+    "type": "GPL-2.0",
+    "name": "GNU General Public License v2",
+    "url": "http://www.gnu.org/licenses/gpl-2.0.html"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-clean": "~0.6.0",
+    "grunt-contrib-jshint": "~0.11.0",
+    "grunt-contrib-uglify": "~0.7.0",
+    "grunt-banner": "~0.3.1",
+    "grunt-text-replace": "~0.4.0",
+    "grunt-wp-i18n": "~0.5.3",
+    "bower": "~1.3.12"
+  }
+}

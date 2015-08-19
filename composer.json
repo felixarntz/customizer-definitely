@@ -1,0 +1,47 @@
+{
+  "name": "felixarntz/customizer-definitely",
+  "description": "This framework plugin makes adding customizer panels, sections and fields to WordPress very simple, yet flexible. It all works using a single action and an array.",
+  "version": "0.5.0",
+  "license": "GPL-2.0",
+  "type": "wordpress-plugin",
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "framework",
+    "library",
+    "developer",
+    "customizer",
+    "admin",
+    "backend",
+    "ui"
+  ],
+  "homepage": "http://wordpress.org/plugins/customizer-definitely/",
+  "authors": [
+    {
+      "name": "Felix Arntz",
+      "email": "felix-arntz@leaves-and-love.net",
+      "homepage": "http://leaves-and-love.net",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "email": "felix-arntz@leaves-and-love.net",
+    "issues": "https://github.com/felixarntz/customizer-definitely/issues"
+  },
+  "config": {
+    "preferred-install": "dist"
+  },
+  "autoload": {
+    "psr-4": {
+      "WPCD\\": "inc/WPCD/"
+    },
+    "files": [
+      "inc/functions.php"
+    ]
+  },
+  "require": {
+    "composer/installers": "~1.0",
+    "felixarntz/wpdlib": "dev-master",
+    "felixarntz/leavesandlove-wp-plugin-util": "~1.6.0"
+  }
+}
