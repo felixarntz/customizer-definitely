@@ -38,6 +38,10 @@ if ( ! class_exists( 'WPCD\Components\Section' ) ) {
 				$args['type'] = $args['mode'];
 				unset( $args['mode'] );
 			}
+			if ( isset( $args['position'] ) ) {
+				$args['priority'] = $args['position'];
+				unset( $args['position'] );
+			}
 
 			$slug = $this->slug;
 			if ( 'general' != $parent_panel->slug ) {
@@ -62,8 +66,15 @@ if ( ! class_exists( 'WPCD\Components\Section' ) ) {
 					$this->args['capability'] = $parent->capability;
 				}
 
-				if ( null !== $this->args['priority'] ) {
-					$this->args['priority'] = floatval( $this->args['priority'] );
+				if ( isset( $this->args['priority'] ) ) {
+					if ( null === $this->args['position'] ) {
+						$this->args['position'] = $this->args['priority'];
+					}
+					unset( $this->args['priority'] );
+				}
+
+				if ( null !== $this->args['position'] ) {
+					$this->args['position'] = floatval( $this->args['position'] );
 				}
 			}
 
@@ -83,7 +94,7 @@ if ( ! class_exists( 'WPCD\Components\Section' ) ) {
 				'title'					=> __( 'Section title', 'wpcd' ),
 				'description'			=> '',
 				'capability'			=> null,
-				'priority'				=> null,
+				'position'				=> null,
 				'theme_supports'		=> null,
 				'mode'					=> null,
 			);

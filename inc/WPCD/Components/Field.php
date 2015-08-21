@@ -76,7 +76,7 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 				'description'			=> null,
 				'type'					=> null,
 				'options'				=> 'choices',
-				'priority'				=> null,
+				'position'				=> 'priority',
 				'active_callback'		=> null,
 			);
 
@@ -195,8 +195,15 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 					$this->args['capability'] = $parent->capability;
 				}
 
-				if ( null !== $this->args['priority'] ) {
-					$this->args['priority'] = floatval( $this->args['priority'] );
+				if ( isset( $this->args['priority'] ) ) {
+					if ( null === $this->args['position'] ) {
+						$this->args['position'] = $this->args['priority'];
+					}
+					unset( $this->args['priority'] );
+				}
+
+				if ( null !== $this->args['position'] ) {
+					$this->args['position'] = floatval( $this->args['position'] );
 				}
 
 				if ( null === $this->args['mode'] ) {
@@ -262,7 +269,7 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 				'default'				=> null,
 				'required'				=> false,
 				'capability'			=> null,
-				'priority'				=> null,
+				'position'				=> null,
 				'theme_supports'		=> null,
 				'mode'					=> null,
 				'transport'				=> null,

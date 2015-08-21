@@ -38,6 +38,10 @@ if ( ! class_exists( 'WPCD\Components\Panel' ) ) {
 				$args['type'] = $args['mode'];
 				unset( $args['mode'] );
 			}
+			if ( isset( $args['position'] ) ) {
+				$args['priority'] = $args['position'];
+				unset( $args['position'] );
+			}
 			if ( isset( $args['settings_mode'] ) ) {
 				unset( $args['settings_mode'] );
 			}
@@ -61,8 +65,15 @@ if ( ! class_exists( 'WPCD\Components\Panel' ) ) {
 					$this->args['capability'] = 'edit_theme_options';
 				}
 
-				if ( null !== $this->args['priority'] ) {
-					$this->args['priority'] = floatval( $this->args['priority'] );
+				if ( isset( $this->args['priority'] ) ) {
+					if ( null === $this->args['position'] ) {
+						$this->args['position'] = $this->args['priority'];
+					}
+					unset( $this->args['priority'] );
+				}
+
+				if ( null !== $this->args['position'] ) {
+					$this->args['position'] = floatval( $this->args['position'] );
 				}
 			}
 
@@ -82,7 +93,7 @@ if ( ! class_exists( 'WPCD\Components\Panel' ) ) {
 				'title'					=> __( 'Panel title', 'wpcd' ),
 				'description'			=> '',
 				'capability'			=> null,
-				'priority'				=> null,
+				'position'				=> null,
 				'theme_supports'		=> null,
 				'mode'					=> null,
 				'settings_mode'			=> null,

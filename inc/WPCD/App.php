@@ -30,18 +30,6 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 
 		/**
 		 * @since 0.5.0
-		 * @var boolean Holds the status whether the initialization function has been called yet.
-		 */
-		private $initialization_triggered = false;
-
-		/**
-		 * @since 0.5.0
-		 * @var boolean Holds the status whether the app has been initialized yet.
-		 */
-		private $initialized = false;
-
-		/**
-		 * @since 0.5.0
 		 * @var array Holds the plugin data.
 		 */
 		protected static $_args = array();
@@ -115,7 +103,7 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 		/**
 		 * Initializes the plugin framework.
 		 *
-		 * This function adds all components to the plugin. It is executed on the 'after_setup_theme' hook with priority 1.
+		 * This function adds all components to the plugin. It is executed on the 'after_setup_theme' hook with priority 3.
 		 * The action 'wpcd' should be used to add all the components.
 		 *
 		 * @internal
@@ -124,9 +112,7 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 		 * @since 0.5.0
 		 */
 		public function init() {
-			if ( ! $this->initialization_triggered ) {
-				$this->initialization_triggered = true;
-
+			if ( ! did_action( 'wpcd' ) ) {
 				ComponentManager::register_hierarchy( apply_filters( 'wpcd_class_hierarchy', array(
 					'WPCD\Components\Panel'			=> array(
 						'WPCD\Components\Section'		=> array(
@@ -138,8 +124,6 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 				do_action( 'wpcd', $this );
 
 				//TODO: hook into WPOD to create customizer panels from tabs
-
-				$this->initialized = true;
 			} else {
 				self::doing_it_wrong( __METHOD__, __( 'This function should never be called manually.', 'wpcd' ), '0.5.0' );
 			}
