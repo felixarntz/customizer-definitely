@@ -40,22 +40,7 @@ module.exports = function(grunt) {
 
 		jshint: {
 			options: {
-				boss: true,
-				curly: true,
-				eqeqeq: true,
-				immed: true,
-				noarg: true,
-				quotmark: "single",
-				undef: true,
-				unused: true,
-				browser: true,
-				globals: {
-					jQuery: false,
-					console: false,
-					wp: false,
-					wpcd_customizer: false,
-					ajaxurl: false
-				}
+				jshintrc: 'assets/.jshintrc'
 			},
 			framework: {
 				src: [
