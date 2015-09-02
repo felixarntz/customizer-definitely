@@ -8,7 +8,7 @@
 namespace WPCD\Components;
 
 use WPDLib\Components\Base as Base;
-use WP_Customize_Panel;
+use WP_Customize_Panel as WPCustomizePanel;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
@@ -48,7 +48,7 @@ if ( ! class_exists( 'WPCD\Components\Panel' ) ) {
 
 			$slug = $this->slug;
 
-			$wp_customize->add_panel( new WP_Customize_Panel( $wp_customize, $slug, $args ) );
+			$wp_customize->add_panel( new WPCustomizePanel( $wp_customize, $slug, $args ) );
 		}
 
 		/**

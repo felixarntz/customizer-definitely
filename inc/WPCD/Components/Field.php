@@ -7,13 +7,14 @@
 
 namespace WPCD\Components;
 
+use WPCD\Customizer as Customizer;
 use WPDLib\Components\Manager as ComponentManager;
 use WPDLib\Components\Base as Base;
 use WPDLib\FieldTypes\Manager as FieldManager;
 use WPDLib\Util\Error as UtilError;
 use WP_Error as WPError;
-use WP_Customize_Setting;
-use WP_Customize_Control;
+use WP_Customize_Setting as WPCustomizeSetting;
+use WP_Customize_Control as WPCustomizeControl;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
@@ -92,7 +93,7 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 			}
 
 			$_remaining_args = array_diff_key( $this->args, $setting_args_map, $control_args_map );
-			unset( $_remaining_args['live_preview_args'] );
+			unset( $_remaining_args['preview_args'] );
 
 			$control_args['input_attrs'] = $_remaining_args;
 
@@ -108,8 +109,8 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 			$control_args['section'] = $parent_section_slug;
 			$control_args['setting'] = $id;
 
-			$wp_customize->add_setting( new WP_Customize_Setting( $wp_customize, $id, $setting_args ) );
-			$wp_customize->add_control( new WP_Customize_Control( $wp_customize, $slug, $control_args ) );
+			$wp_customize->add_setting( new WPCustomizeSetting( $wp_customize, $id, $setting_args ) );
+			$wp_customize->add_control( new WPCustomizeControl( $wp_customize, $slug, $control_args ) );
 		}
 
 		/**
@@ -210,23 +211,40 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 					$this->args['mode'] = $parent->get_parent()->mode;
 				}
 
-				if ( ! is_array( $this->args['live_preview_args'] ) ) {
-					$this->args['live_preview_args'] = array();
+				$this->args['preview_args'] = Customizer::instance()->validate_preview_args( $this->args['preview_args'] );
+
+				if ( ! is_array( $this->args['preview_args'] ) ) {
+					$this->args['preview_args'] = array();
 				}
-				$this->args['live_preview_args'] = wp_parse_args( $this->args['live_preview_args'], array(
+				$this->args['preview_args'] = wp_parse_args( $this->args['preview_args'], array(
 					'callback'		=> '',
 					'timeout'		=> 0,
-					'selectors'		=> array(),
-					'property'		=> '',
-					'prefix'		=> '',
-					'suffix'		=> '',
+					'data'			=> array(),
 				) );
-				if ( ! is_array( $this->args['live_preview_args']['selectors'] ) ) {
-					if ( ! empty( $this->args['live_preview_args']['selectors'] ) ) {
-						$this->args['live_preview_args']['selectors'] = array( $this->args['live_preview_args']['selectors'] );
-					} else {
-						$this->args['live_preview_args']['selectors'] = array();
-					}
+				switch ( $this->args['preview_args']['callback'] ) {
+					case 'update_style':
+					case 'update_attr':
+					case 'update_content':
+						if ( ! is_array( $this->args['preview_args']['data'] ) ) {
+							if ( ! empty( $this->args['preview_args']['data'] ) ) {
+								$this->args['preview_args']['data'] = array( $this->args['preview_args']['data'] );
+							} else {
+								$this->args['preview_args']['data'] = array();
+							}
+						}
+						for ( $i = 0; $i < count( $this->args['preview_args']['data'] ); $i++ ) {
+							$this->args['preview_args']['data'][ $i ] = wp_parse_args( $this->args['preview_args']['data'][ $i ], array(
+								'selectors'		=> array(),
+								'property'		=> '',
+								'prefix'		=> '',
+								'suffix'		=> '',
+							) );
+						}
+						break;
+					default:
+						if ( $this->args['preview_args']['callback'] ) {
+							$this->args['preview_args']['data'] = apply_filters( 'wpcd_validate_' . $this->args['preview_args']['callback'] . '_data', $this->args['preview_args']['data'] );
+						}
 				}
 
 				if ( is_array( $this->args['class'] ) ) {
@@ -276,7 +294,7 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 				'active_callback'		=> null,
 				'sanitize_callback'		=> null,
 				'sanitize_js_callback'	=> null,
-				'live_preview_args'		=> array(),
+				'preview_args'			=> array(),
 			);
 
 			/**

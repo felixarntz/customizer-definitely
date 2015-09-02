@@ -8,7 +8,7 @@
 namespace WPCD\Components;
 
 use WPDLib\Components\Base as Base;
-use WP_Customize_Section;
+use WP_Customize_Section as WPCustomizeSection;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
@@ -49,7 +49,7 @@ if ( ! class_exists( 'WPCD\Components\Section' ) ) {
 				$this->args['panel'] = $parent_panel->slug;
 			}
 
-			$wp_customize->add_section( new WP_Customize_Section( $wp_customize, $slug, $args ) );
+			$wp_customize->add_section( new WPCustomizeSection( $wp_customize, $slug, $args ) );
 		}
 
 		/**

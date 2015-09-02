@@ -15,12 +15,10 @@
 				} else if ( typeof setting_args.callback === 'function' ) {
 					setting_function = setting_args.callback;
 				}
-				setting_args.callback = undefined;
 			}
 
 			if ( typeof setting_args.timeout !== 'undefined' ) {
 				setting_timeout = parseInt( setting_args.timeout, 10 );
-				setting_args.timeout = undefined;
 			}
 
 			if ( setting_function ) {
@@ -34,14 +32,14 @@
 							}
 
 							intent = window.setTimeout( function() {
-								exports.update_setting( setting_function, value, setting_args );
+								exports.update_setting( setting_function, value, setting_args.data );
 							}, setting_timeout );
 						});
 					});
 				} else {
 					wp.customize( setting_slug, function( style ) {
 						style.bind( function( value ) {
-							exports.update_setting( setting_function, value, setting_args );
+							exports.update_setting( setting_function, value, setting_args.data );
 						});
 					});
 				}

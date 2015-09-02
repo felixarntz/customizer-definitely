@@ -105,5 +105,47 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 
 			return $settings;
 		}
+
+		public function validate_preview_args( $args ) {
+			if ( ! is_array( $args ) ) {
+				$args = array();
+			}
+
+			$default_timeout = ( isset( $args['callback'] ) && 'update_style' === $args['callback'] ) ? 1000 : 0;
+
+			$args = wp_parse_args( $args, array(
+				'callback'		=> '',
+				'timeout'		=> $default_timeout,
+				'data'			=> array(),
+			) );
+
+			if ( $args['callback'] ) {
+				switch ( $args['callback'] ) {
+					case 'update_style':
+					case 'update_attr':
+					case 'update_content':
+						if ( ! is_array( $args['data'] ) ) {
+							if ( ! empty( $args['data'] ) ) {
+								$args['data'] = array( $args['data'] );
+							} else {
+								$args['data'] = array();
+							}
+						}
+						for ( $i = 0; $i < count( $args['data'] ); $i++ ) {
+							$args['data'][ $i ] = wp_parse_args( $args['data'][ $i ], array(
+								'selectors'		=> array(),
+								'property'		=> '',
+								'prefix'		=> '',
+								'suffix'		=> '',
+							) );
+						}
+						break;
+					default:
+						$args['data'] = apply_filters( 'wpcd_validate_' . $args['callback'] . '_data', $args['data'] );
+				}
+			}
+
+			return $args;
+		}
 	}
 }
