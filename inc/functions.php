@@ -1,6 +1,6 @@
 <?php
 /**
- * @package WPPTD
+ * @package WPCD
  * @version 0.5.0
  * @author Felix Arntz <felix-arntz@leaves-and-love.net>
  */

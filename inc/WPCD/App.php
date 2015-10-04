@@ -125,7 +125,7 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 
 				//TODO: hook into WPOD to create customizer panels from tabs
 			} else {
-				self::doing_it_wrong( __METHOD__, __( 'This function should never be called manually.', 'wpcd' ), '0.5.0' );
+				self::doing_it_wrong( __METHOD__, __( 'This function should never be called manually.', 'customizer-definitely' ), '0.5.0' );
 			}
 		}
 

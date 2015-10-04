@@ -176,7 +176,7 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 		public function validate_setting( $setting = null, $skip_required = false ) {
 			if ( $this->args['required'] && ! $skip_required ) {
 				if ( $setting === null || $this->_field->is_empty( $setting ) ) {
-					return new WPError( 'invalid_empty_value', __( 'No value was provided for the required field.', 'wpcd' ) );
+					return new WPError( 'invalid_empty_value', __( 'No value was provided for the required field.', 'customizer-definitely' ) );
 				}
 			}
 			return $this->_field->validate( $setting );
@@ -260,7 +260,7 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 
 				$this->_field = FieldManager::get_instance( $this->args );
 				if ( $this->_field === null ) {
-					return new UtilError( 'no_valid_field_type', sprintf( __( 'The field type %1$s assigned to the field component %2$s is not a valid field type.', 'wpcd' ), $this->args['type'], $this->slug ), '', ComponentManager::get_scope() );
+					return new UtilError( 'no_valid_field_type', sprintf( __( 'The field type %1$s assigned to the field component %2$s is not a valid field type.', 'customizer-definitely' ), $this->args['type'], $this->slug ), '', ComponentManager::get_scope() );
 				}
 				if ( null === $this->args['default'] ) {
 					$this->args['default'] = $this->_field->validate();
@@ -280,7 +280,7 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 		 */
 		protected function get_defaults() {
 			$defaults = array(
-				'title'					=> __( 'Field title', 'wpcd' ),
+				'title'					=> __( 'Field title', 'customizer-definitely' ),
 				'description'			=> '',
 				'type'					=> 'text',
 				'class'					=> '',

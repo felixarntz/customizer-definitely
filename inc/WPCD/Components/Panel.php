@@ -90,7 +90,7 @@ if ( ! class_exists( 'WPCD\Components\Panel' ) ) {
 		 */
 		protected function get_defaults() {
 			$defaults = array(
-				'title'					=> __( 'Panel title', 'wpcd' ),
+				'title'					=> __( 'Panel title', 'customizer-definitely' ),
 				'description'			=> '',
 				'capability'			=> null,
 				'position'				=> null,

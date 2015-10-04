@@ -91,7 +91,7 @@ if ( ! class_exists( 'WPCD\Components\Section' ) ) {
 		 */
 		protected function get_defaults() {
 			$defaults = array(
-				'title'					=> __( 'Section title', 'wpcd' ),
+				'title'					=> __( 'Section title', 'customizer-definitely' ),
 				'description'			=> '',
 				'capability'			=> null,
 				'position'				=> null,

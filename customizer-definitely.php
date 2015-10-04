@@ -8,7 +8,7 @@ Author: Felix Arntz
 Author URI: http://leaves-and-love.net
 License: GNU General Public License v2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Text Domain: wpcd
+Text Domain: customizer-definitely
 Domain Path: /languages/
 Tags: wordpress, plugin, framework, library, developer, customizer, admin, backend, ui
 */
@@ -32,7 +32,7 @@ if ( ! class_exists( 'WPCD\App' ) && file_exists( dirname( __FILE__ ) . '/vendor
 	'version'			=> '0.5.0',
 	'main_file'			=> __FILE__,
 	'namespace'			=> 'WPCD',
-	'textdomain'		=> 'wpcd',
+	'textdomain'		=> 'customizer-definitely',
 ), array(
 	'phpversion'		=> '5.3.0',
 	'wpversion'			=> '4.2',

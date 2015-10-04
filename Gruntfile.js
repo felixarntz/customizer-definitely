@@ -7,7 +7,7 @@ module.exports = function(grunt) {
 				' * \n' +
 				' * <%= pkg.author.name %> <<%= pkg.author.email %>>\n' +
 				' */',
-		pluginheader: 	'/*\n' +
+		pluginheader:	'/*\n' +
 						'Plugin Name: Customizer Definitely\n' +
 						'Plugin URI: <%= pkg.homepage %>\n' +
 						'Description: <%= pkg.description %>\n' +
@@ -16,15 +16,15 @@ module.exports = function(grunt) {
 						'Author URI: <%= pkg.author.url %>\n' +
 						'License: <%= pkg.license.name %>\n' +
 						'License URI: <%= pkg.license.url %>\n' +
-						'Text Domain: wpcd\n' +
+						'Text Domain: customizer-definitely\n' +
 						'Domain Path: /languages/\n' +
 						'Tags: wordpress, plugin, framework, library, developer, customizer, admin, backend, ui\n' +
 						'*/',
-		fileheader: '/**\n' +
-					' * @package WPCD\n' +
-					' * @version <%= pkg.version %>\n' +
-					' * @author <%= pkg.author.name %> <<%= pkg.author.email %>>\n' +
-					' */',
+		fileheader:		'/**\n' +
+						' * @package WPCD\n' +
+						' * @version <%= pkg.version %>\n' +
+						' * @author <%= pkg.author.name %> <<%= pkg.author.email %>>\n' +
+						' */',
 
 		clean: {
 			framework: [
@@ -34,7 +34,7 @@ module.exports = function(grunt) {
 				'assets/functions.min.js'
 			],
 			translation: [
-				'languages/wpcd.pot'
+				'languages/customizer-definitely.pot'
 			]
 		},
 
@@ -117,7 +117,7 @@ module.exports = function(grunt) {
 					domainPath: '/languages',
 					exclude: [ 'vendor/.*' ],
 					potComments: 'Copyright (c) 2015-<%= grunt.template.today("yyyy") %> <%= pkg.author.name %>',
-					potFilename: 'wpcd.pot',
+					potFilename: 'customizer-definitely.pot',
 					potHeaders: {
 						'language-team': '<%= pkg.author.name %> <<%= pkg.author.email %>>',
 						'last-translator': '<%= pkg.author.name %> <<%= pkg.author.email %>>',
