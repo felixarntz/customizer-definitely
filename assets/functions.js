@@ -1,12 +1,12 @@
 ( function( exports, $ ) {
 
-	exports.callbacks.update_style = function( value, args ) {
-		var $style = $( '#wpcd-customizer-styles' );
-		if ( $style.length < 1 ) {
+	exports.callbacks.update_style = function( value, args, setting_slug ) {
+		//TODO: break style tag into per setting tags, make sure to include after the Customizer CSS file (give 'data-scope="customizer"' attribute to all the tags)
+		if ( $( '#wpcd-customizer-styles' ).length < 1 ) {
 			$( 'head' ).append( '<style type="text/css" id="wpcd-customizer-styles"></style>' );
 		}
 
-		var style_content = $style.text();
+		var style_content = $( '#wpcd-customizer-styles' ).text();
 
 		for ( var i in args ) {
 			var data = args[ i ];
@@ -42,10 +42,10 @@
 			}
 		}
 
-		$style.text( style_content );
+		$( '#wpcd-customizer-styles' ).text( style_content );
 	};
 
-	exports.callbacks.update_attr = function( value, args ) {
+	exports.callbacks.update_attr = function( value, args, setting_slug ) {
 		for ( var i in args ) {
 			var data = args[ i ];
 
@@ -57,7 +57,7 @@
 		}
 	};
 
-	exports.callbacks.update_content = function( value, args ) {
+	exports.callbacks.update_content = function( value, args, setting_slug ) {
 		for ( var i in args ) {
 			var data = args[ i ];
 

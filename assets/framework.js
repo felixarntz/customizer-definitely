@@ -32,14 +32,14 @@
 							}
 
 							intent = window.setTimeout( function() {
-								exports.update_setting( setting_function, value, setting_args.data );
+								exports.update_setting( setting_function, value, setting_args.data, setting_slug );
 							}, setting_timeout );
 						});
 					});
 				} else {
 					wp.customize( setting_slug, function( style ) {
 						style.bind( function( value ) {
-							exports.update_setting( setting_function, value, setting_args.data );
+							exports.update_setting( setting_function, value, setting_args.data, setting_slug );
 						});
 					});
 				}

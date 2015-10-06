@@ -238,6 +238,7 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 								'property'		=> '',
 								'prefix'		=> '',
 								'suffix'		=> '',
+								//TODO: for CSS add media query and (if possible) a priority
 							) );
 						}
 						break;

@@ -59,6 +59,8 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 
 			add_filter( 'wpcd_panel_validated', array( $this, 'panel_validated' ), 10, 2 );
 			add_filter( 'wpcd_section_validated', array( $this, 'section_validated' ), 10, 2 );
+
+			//TODO: generate wpcd-customizer.css file dynamically from all 'update_style' fields, auto-include like a normal stylesheet (use rewrites)
 		}
 
 		public function set_scope( $scope ) {
