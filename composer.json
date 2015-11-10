@@ -2,7 +2,7 @@
   "name": "felixarntz/customizer-definitely",
   "description": "This framework plugin makes adding customizer panels, sections and fields to WordPress very simple, yet flexible. It all works using a single action and an array.",
   "version": "0.5.0",
-  "license": "GPL-2.0",
+  "license": "GPL-3.0",
   "type": "wordpress-plugin",
   "keywords": [
     "wordpress",
@@ -41,7 +41,7 @@
   },
   "require": {
     "composer/installers": "~1.0",
-    "felixarntz/wpdlib": "dev-master",
-    "felixarntz/leavesandlove-wp-plugin-util": "~1.6"
+    "felixarntz/wpdlib": "0.5.1",
+    "felixarntz/leavesandlove-wp-plugin-util": "1.6.2"
   }
 }
