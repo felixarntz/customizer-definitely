@@ -12,9 +12,9 @@ Stable tag:        0.5.0
 Version:           0.5.0
 License:           GPL v2 
 License URI:       http://www.gnu.org/licenses/gpl-2.0.html
-Tags:              wordpress, plugin, framework, library, developer, customizer, admin, backend, ui
+Tags:              wordpress, plugin, definitely, framework, library, developer, admin, backend, structured data, ui, api, cms, customizer
 
-This framework plugin makes adding post types with taxonomies and meta to WordPress very simple, yet flexible. It all works using a single action and an array.
+This framework plugin makes adding customizer panels, sections and fields to WordPress very simple, yet flexible.
 
 == Description ==
 
