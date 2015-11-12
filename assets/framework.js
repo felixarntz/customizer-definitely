@@ -6,7 +6,7 @@
 		for ( var i in settings_keys ) {
 			var setting_slug = settings_keys[ i ];
 			var setting_args = exports.settings[ setting_slug ];
-			var setting_function = undefined;
+			var setting_function;
 			var setting_timeout = 0;
 
 			if ( typeof setting_args.callback !== 'undefined' ) {
@@ -22,28 +22,32 @@
 			}
 
 			if ( setting_function ) {
-				if ( setting_timeout > 0 ) {
-					wp.customize( setting_slug, function( style ) {
-						var intent = undefined;
-
-						style.bind( function( value ) {
-							if ( typeof intent !== 'undefined' ) {
-								window.clearTimeout( intent );
-							}
-
-							intent = window.setTimeout( function() {
-								exports.update_setting( setting_function, value, setting_args.data, setting_slug );
-							}, setting_timeout );
-						});
-					});
-				} else {
-					wp.customize( setting_slug, function( style ) {
-						style.bind( function( value ) {
-							exports.update_setting( setting_function, value, setting_args.data, setting_slug );
-						});
-					});
-				}
+				exports.bind_setting( setting_slug, setting_function, setting_args.data, setting_timeout );
 			}
+		}
+	};
+
+	exports.bind_setting = function( setting_slug, setting_function, setting_data, setting_timeout ) {
+		if ( 0 < setting_timeout ) {
+			wp.customize( setting_slug, function( style ) {
+				var intent;
+
+				style.bind( function( value ) {
+					if ( typeof intent !== 'undefined' ) {
+						window.clearTimeout( intent );
+					}
+
+					intent = window.setTimeout( function() {
+						exports.update_setting( setting_function, value, setting_data );
+					}, setting_timeout );
+				});
+			});
+		} else {
+			wp.customize( setting_slug, function( style ) {
+				style.bind( function( value ) {
+					exports.update_setting( setting_function, value, setting_data );
+				});
+			});
 		}
 	};
 

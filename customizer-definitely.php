@@ -6,8 +6,8 @@ Description: This framework plugin makes adding customizer panels, sections and 
 Version: 0.5.0
 Author: Felix Arntz
 Author URI: http://leaves-and-love.net
-License: GNU General Public License v2
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+License: GNU General Public License v3
+License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Text Domain: customizer-definitely
 Domain Path: /languages/
 Tags: wordpress, plugin, framework, library, developer, customizer, admin, backend, ui
