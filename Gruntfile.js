@@ -18,7 +18,7 @@ module.exports = function(grunt) {
 						'License URI: <%= pkg.license.url %>\n' +
 						'Text Domain: customizer-definitely\n' +
 						'Domain Path: /languages/\n' +
-						'Tags: wordpress, plugin, framework, library, developer, customizer, admin, backend, ui\n' +
+						'Tags: <%= pkg.keywords.join(", ") %>\n' +
 						'*/',
 		fileheader:		'/**\n' +
 						' * @package WPCD\n' +
