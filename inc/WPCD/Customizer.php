@@ -53,6 +53,10 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 		 * @since 0.5.0
 		 */
 		private function __construct() {
+			add_action( 'after_setup_theme', array( $this, 'add_hooks' ) );
+		}
+
+		public function add_hooks() {
 			add_action( 'customize_register', array( $this, 'register_components' ), 10, 1 );
 			add_action( 'customize_preview_init', array( $this, 'enqueue_preview_assets' ), 10, 1 );
 		}
@@ -75,6 +79,7 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 			wp_localize_script( 'wpcd-functions', 'wpcd_customizer', array(
 				'settings'				=> $this->get_settings(),
 				'callbacks'				=> new \stdClass(),
+				'util'					=> new \stdClass();
 			) );
 
 			$main_dependencies = array( 'customize-base', 'wpcd-functions' );
@@ -86,7 +91,7 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 				$main_dependencies[] = $script_handle;
 			}
 
-			wp_enqueue_script( 'wpcd-framework', App::get_url( 'assets/framework.min.js' ), $main_dependencies, App::get_info( 'version' ), true );
+			wp_enqueue_script( 'wpcd-framework', App::get_url( 'assets/framework.js' ), $main_dependencies, App::get_info( 'version' ), true );
 		}
 
 		public function get_settings() {
@@ -98,8 +103,7 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 			$settings = array();
 			foreach ( $fields as $field ) {
 				if ( 'postMessage' == $field->transport ) {
-					//TODO: we probably need ID here, not slug
-					$settings[ $field->slug ] = $field->live_preview_args;
+					$settings[ $field->_id ] = $field->preview_args;
 				}
 			}
 

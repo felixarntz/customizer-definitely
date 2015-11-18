@@ -29,30 +29,30 @@
 
 	exports.bind_setting = function( setting_slug, setting_function, setting_data, setting_timeout ) {
 		if ( 0 < setting_timeout ) {
-			wp.customize( setting_slug, function( style ) {
+			wp.customize( setting_slug, function( value ) {
 				var intent;
 
-				style.bind( function( value ) {
+				value.bind( function( to ) {
 					if ( typeof intent !== 'undefined' ) {
 						window.clearTimeout( intent );
 					}
 
 					intent = window.setTimeout( function() {
-						exports.update_setting( setting_function, value, setting_data );
+						exports.update_setting( setting_slug, setting_function, to, setting_data );
 					}, setting_timeout );
 				});
 			});
 		} else {
-			wp.customize( setting_slug, function( style ) {
-				style.bind( function( value ) {
-					exports.update_setting( setting_function, value, setting_data );
+			wp.customize( setting_slug, function( value ) {
+				value.bind( function( to ) {
+					exports.update_setting( setting_slug, setting_function, to, setting_data );
 				});
 			});
 		}
 	};
 
-	exports.update_setting = function( callback, value, args ) {
-		callback.call( value, args );
+	exports.update_setting = function( slug, callback, value, args ) {
+		callback.call( value, args, slug );
 	};
 
 })( wpcd_customizer, wp );

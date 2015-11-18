@@ -23,10 +23,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'WPCD\App' ) && file_exists( dirname( __FILE__ ) . '/vendor/autoload.php' ) ) {
-	require_once dirname( __FILE__ ) . '/vendor/autoload.php';
+	if ( version_compare( phpversion(), '5.3.0' ) >= 0 ) {
+		require_once dirname( __FILE__ ) . '/vendor/autoload.php';
+	} else {
+		require_once dirname( __FILE__ ) . '/vendor/felixarntz/leavesandlove-wp-plugin-util/leavesandlove-wp-plugin-loader.php';
+	}
 }
 
-\LaL_WP_Plugin_Loader::load_plugin( array(
+LaL_WP_Plugin_Loader::load_plugin( array(
 	'slug'				=> 'customizer-definitely',
 	'name'				=> 'Customizer Definitely',
 	'version'			=> '0.5.0',

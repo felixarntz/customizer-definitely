@@ -1,83 +1,68 @@
 ( function( exports, $ ) {
 
-	exports.callbacks.update_style = function( value, args ) {
-		//TODO: break style tag into per setting tags, make sure to include after the Customizer CSS file (give 'data-scope="customizer"' attribute to all the tags)
-		if ( $( '#wpcd-customizer-styles' ).length < 1 ) {
-			$( 'head' ).append( '<style type="text/css" id="wpcd-customizer-styles"></style>' );
+	exports.util.sanitize_slug = function( slug ) {
+		var parts = slug.replace( ']', '' ).split( '[' );
+
+		return parts.join( '-' );
+	};
+
+	exports.callbacks.update_style = function( value, args, slug ) {
+		var sanitized_slug = exports.util.sanitize_slug( slug );
+
+		if ( $( '#wpcd-style-' + sanitized_slug ).length < 1 ) {
+			$( 'head' ).append( '<style type="text/css" id="wpcd-style-' + sanitized_slug + '"></style>' );
 		}
 
-		var style_content = $( '#wpcd-customizer-styles' ).text();
+		var style_content = '';
 
 		for ( var i in args ) {
 			var data = args[ i ];
 
 			if ( data.selectors.length > 0 && data.property ) {
-				style_content = _update_single_style( style_content, value, data );
+				style_content += _update_single_style( value, data, slug );
 			}
 		}
 
-		$( '#wpcd-customizer-styles' ).text( style_content );
+		$( '#wpcd-style-' + sanitized_slug ).text( style_content );
 	};
 
-	exports.callbacks.update_attr = function( value, args ) {
+	exports.callbacks.update_attr = function( value, args, slug ) {
 		for ( var i in args ) {
 			var data = args[ i ];
 
 			if ( data.selectors.length > 0 && data.property ) {
-				_update_single_attr( value, data );
+				_update_single_attr( value, data, slug );
 			}
 		}
 	};
 
-	exports.callbacks.update_content = function( value, args ) {
+	exports.callbacks.update_content = function( value, args, slug ) {
 		for ( var i in args ) {
 			var data = args[ i ];
 
 			if ( data.selectors.length > 0 ) {
-				_update_single_content( value, data );
+				_update_single_content( value, data, slug );
 			}
 		}
 	};
 
-	function _update_single_style( style_content, value, data ) {
-		var re = new RegExp( '^' + data.selectors.join( ', ' ) + ' \{\\n' + '([^]+)\\n\}\\n', 'm' );
-		var found = false;
+	function _update_single_style( value, data, slug ) {
+		var style = '';
 
-		style_content = style_content.replace( re, function( match, properties ) {
-			found = true;
+		style += data.selectors.join( ', ' ) + '{\n';
+		style += '\t' + data.property + ': ' + data.prefix + value + data.suffix + ';\n';
+		style += '}\n\n';
 
-			var subre = new RegExp( '^' + data.property + ': (.+);$', 'm' );
-			var subfound = false;
-
-			var new_properties = properties.replace( subre, function( match, property_content ) {
-				subfound = true;
-				return match.replace( property_content, data.prefix + value + data.suffix );
-			});
-
-			if ( ! subfound ) {
-				new_properties += '\n' + data.property + ': ' + data.prefix + value + data.suffix + ';';
-			}
-
-			return match.replace( properties, new_properties );
-		});
-
-		if ( ! found ) {
-			if ( '' !== style_content ) {
-				style_content += '\n';
-			}
-			style_content += data.selectors.join( ', ' ) + ' {\n' + data.property + ' ' + data.prefix + value + data.suffix + ';\n}\n';
-		}
-
-		return style_content;
+		return style;
 	}
 
-	function _update_single_attr( value, data ) {
+	function _update_single_attr( value, data, slug ) {
 		$( data.selectors.join( ', ' ) ).each( function() {
 			$( this ).attr( data.property, data.prefix + value + data.suffix );
 		});
 	}
 
-	function _update_single_content( value, data ) {
+	function _update_single_content( value, data, slug ) {
 		$( data.selectors.join( ', ' ) ).each( function() {
 			if ( 'html' === data.property ) {
 				$( this ).html( data.prefix + value + data.suffix );

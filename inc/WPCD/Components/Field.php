@@ -15,6 +15,12 @@ use WPDLib\Util\Error as UtilError;
 use WP_Error as WPError;
 use WP_Customize_Setting as WPCustomizeSetting;
 use WP_Customize_Control as WPCustomizeControl;
+use WP_Customize_Color_Control as WPCustomizeColorControl;
+use WP_Customize_Media_Control as WPCustomizeMediaControl;
+use WPCD\Controls\NumberControl as WPCustomizeNumberControl;
+use WPCD\Controls\DatetimeControl as WPCustomizeDatetimeControl;
+use WPCD\Controls\WysiwygControl as WPCustomizeWysiwygControl;
+use WPCD\Controls\MultiControl as WPCustomizeMultiControl;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
@@ -24,16 +30,22 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 
 	class Field extends Base {
 
-		public function __construct( $slug, $args ) {
-			parent::__construct( $slug, $args );
-			$this->validate_filter = 'wpcd_field_validated';
-		}
+		protected $_id = '';
 
 		/**
 		 * @since 0.5.0
 		 * @var WPDLib\FieldTypes\Base Holds the field type object from WPDLib.
 		 */
 		protected $_field = null;
+
+		protected $_setting = null;
+
+		protected $_control = null;
+
+		public function __construct( $slug, $args ) {
+			parent::__construct( $slug, $args );
+			$this->validate_filter = 'wpcd_field_validated';
+		}
 
 		public function __get( $property ) {
 			$value = parent::__get( $property );
@@ -57,8 +69,6 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 				'theme_supports'		=> null,
 				'default'				=> null,
 				'transport'				=> null,
-				'sanitize_callback'		=> null,
-				'sanitize_js_callback'	=> null,
 			);
 
 			$setting_args = array();
@@ -71,6 +81,9 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 					}
 				}
 			}
+
+			$setting_args['sanitize_callback'] = array( $this, 'validate_setting' );
+			$setting_args['sanitize_js_callback'] = array( $this, 'validate_setting' );
 
 			$control_args_map = array(
 				'title'					=> 'label',
@@ -97,73 +110,49 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 
 			$control_args['input_attrs'] = $_remaining_args;
 
-			$slug = $this->slug;
-			$id = $this->slug;
+			$this->_id = $this->slug;
 			$parent_section_slug = $parent_section->slug;
 			if ( 'general' != $parent_panel->slug ) {
-				$slug = $parent_panel->slug . '-' . $slug;
-				$id = $parent_panel->slug . '[' . $slug . ']';
-				$parent_section_slug = $parent_panel->slug . '-' . $parent_section->slug;
+				$this->_id = $parent_panel->slug . '[' . $this->_id . ']';
+				$parent_section_slug = $parent_panel->slug . '-' . $parent_section_slug;
 			}
 
 			$control_args['section'] = $parent_section_slug;
-			$control_args['setting'] = $id;
 
-			$wp_customize->add_setting( new WPCustomizeSetting( $wp_customize, $id, $setting_args ) );
-			$wp_customize->add_control( new WPCustomizeControl( $wp_customize, $slug, $control_args ) );
-		}
+			$wp_customize->add_setting( new WPCustomizeSetting( $wp_customize, $this->_id, $setting_args ) );
+			$this->_setting = $wp_customize->get_setting( $this->_id );
 
-		/**
-		 * Renders the field.
-		 *
-		 * This function will show the input field(s) in the post editing screen.
-		 *
-		 * @since 0.5.0
-		 * @param WP_Post $post the post currently being shown
-		 */
-		public function render( $post ) {
-			$parent_section = $this->get_parent();
-			$parent_panel = $parent_section->get_parent();
-
-			echo '<tr>';
-			echo '<th scope="row"><label for="' . esc_attr( $this->args['id'] ) . '">' . $this->args['title'] . '</label></th>';
-			echo '<td>';
-
-			/**
-			 * This action can be used to display additional content on top of this field.
-			 *
-			 * @since 0.5.0
-			 * @param string the slug of the current field
-			 * @param array the arguments array for the current field
-			 * @param string the slug of the current metabox
-			 * @param string the slug of the current post type
-			 */
-			do_action( 'wpcd_field_before', $this->slug, $this->args, $parent_section->slug, $parent_panel->slug );
-
-			$setting = wpcd_get_setting( $this->slug, $parent_panel->slug );
-
-			$this->_field->display( $setting );
-
-			if ( ! empty( $this->args['description'] ) ) {
-				if ( 'checkbox' != $this->args['type'] ) {
-					echo '<br/>';
-				}
-				echo '<span class="description">' . $this->args['description'] . '</span>';
+			switch ( $this->args['type'] ) {
+				case 'number':
+				case 'range':
+					$wp_customize->add_control( new WPCustomizeNumberControl( $wp_customize, $this->_id, $control_args ) );
+					break;
+				case 'datetime':
+				case 'date':
+				case 'time':
+					$wp_customize->add_control( new WPCustomizeDatetimeControl( $wp_customize, $this->_id, $control_args ) );
+					break;
+				case 'wysiwyg':
+					$wp_customize->add_control( new WPCustomizeWysiwygControl( $wp_customize, $this->_id, $control_args ) );
+					break;
+				case 'multibox':
+				case 'multiselect':
+					$wp_customize->add_control( new WPCustomizeMultiControl( $wp_customize, $this->_id, $control_args ) );
+					break;
+				case 'color':
+					$wp_customize->add_control( new WPCustomizeColorControl( $wp_customize, $this->_id, $control_args ) );
+					break;
+				case 'media':
+					if ( $this->_field->mime_types && 'all' !== $this->_field->mime_types ) {
+						$control_args['mime_type'] = $this->_field->mime_types;
+					}
+					$wp_customize->add_control( new WPCustomizeMediaControl( $wp_customize, $this->_id, $control_args ) );
+					break;
+				default:
+					$wp_customize->add_control( new WPCustomizeControl( $wp_customize, $this->_id, $control_args ) );
 			}
 
-			/**
-			 * This action can be used to display additional content at the bottom of this field.
-			 *
-			 * @since 0.5.0
-			 * @param string the slug of the current field
-			 * @param array the arguments array for the current field
-			 * @param string the slug of the current metabox
-			 * @param string the slug of the current post type
-			 */
-			do_action( 'wpcd_field_after', $this->slug, $this->args, $parent_section->slug, $parent_panel->slug );
-
-			echo '</td>';
-			echo '</tr>';
+			$this->_control = $wp_customize->get_control( $this->_id );
 		}
 
 		/**
@@ -171,15 +160,20 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 		 *
 		 * @since 0.5.0
 		 * @param mixed $meta_value the new option value to validate
-		 * @return mixed either the validated option or a WP_Error object
 		 */
-		public function validate_setting( $setting = null, $skip_required = false ) {
-			if ( $this->args['required'] && ! $skip_required ) {
-				if ( $setting === null || $this->_field->is_empty( $setting ) ) {
+		public function validate_setting( $setting = null ) {
+			//TODO: maybe figure out a way to show errors here
+			if ( $this->args['required'] ) {
+				if ( null === $setting || $this->_field->is_empty( $setting ) ) {
+					return null;
 					return new WPError( 'invalid_empty_value', __( 'No value was provided for the required field.', 'customizer-definitely' ) );
 				}
 			}
-			return $this->_field->validate( $setting );
+			$result = $this->_field->validate( $setting );
+			if ( is_wp_error( $result ) ) {
+				return null;
+			}
+			return $result;
 		}
 
 		/**
@@ -213,39 +207,12 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 
 				$this->args['preview_args'] = Customizer::instance()->validate_preview_args( $this->args['preview_args'] );
 
-				if ( ! is_array( $this->args['preview_args'] ) ) {
-					$this->args['preview_args'] = array();
-				}
-				$this->args['preview_args'] = wp_parse_args( $this->args['preview_args'], array(
-					'callback'		=> '',
-					'timeout'		=> 0,
-					'data'			=> array(),
-				) );
-				switch ( $this->args['preview_args']['callback'] ) {
-					case 'update_style':
-					case 'update_attr':
-					case 'update_content':
-						if ( ! is_array( $this->args['preview_args']['data'] ) ) {
-							if ( ! empty( $this->args['preview_args']['data'] ) ) {
-								$this->args['preview_args']['data'] = array( $this->args['preview_args']['data'] );
-							} else {
-								$this->args['preview_args']['data'] = array();
-							}
-						}
-						for ( $i = 0; $i < count( $this->args['preview_args']['data'] ); $i++ ) {
-							$this->args['preview_args']['data'][ $i ] = wp_parse_args( $this->args['preview_args']['data'][ $i ], array(
-								'selectors'		=> array(),
-								'property'		=> '',
-								'prefix'		=> '',
-								'suffix'		=> '',
-								//TODO: for CSS add media query and (if possible) a priority
-							) );
-						}
-						break;
-					default:
-						if ( $this->args['preview_args']['callback'] ) {
-							$this->args['preview_args']['data'] = apply_filters( 'wpcd_validate_' . $this->args['preview_args']['callback'] . '_data', $this->args['preview_args']['data'] );
-						}
+				if ( null === $this->args['transport'] ) {
+					if ( $this->args['preview_args']['callback'] ) {
+						$this->args['transport'] = 'postMessage';
+					} else {
+						$this->args['transport'] = 'refresh';
+					}
 				}
 
 				if ( is_array( $this->args['class'] ) ) {
@@ -258,6 +225,10 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 
 				/*$this->args['id'] = $this->slug;
 				$this->args['name'] = $this->slug;*/
+
+				if ( 'repeatable' == $this->args['type'] ) {
+					return new UtilError( 'repeatable_not_supported', sprintf( __( 'The repeatable field type assigned to the field component %s is not supported in the Customizer.', 'customizer-definitely' ), $this->slug ), '', ComponentManager::get_scope() );
+				}
 
 				$this->_field = FieldManager::get_instance( $this->args );
 				if ( $this->_field === null ) {
@@ -287,15 +258,13 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 				'class'					=> '',
 				'default'				=> null,
 				'required'				=> false,
-				'capability'			=> null,
 				'position'				=> null,
-				'theme_supports'		=> null,
-				'mode'					=> null,
+				'mode'					=> 'theme_mod',
 				'transport'				=> null,
-				'active_callback'		=> null,
-				'sanitize_callback'		=> null,
-				'sanitize_js_callback'	=> null,
 				'preview_args'			=> array(),
+				'capability'			=> null,
+				'theme_supports'		=> null,
+				'active_callback'		=> null,
 			);
 
 			/**

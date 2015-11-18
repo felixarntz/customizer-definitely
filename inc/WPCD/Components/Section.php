@@ -18,6 +18,10 @@ if ( ! class_exists( 'WPCD\Components\Section' ) ) {
 
 	class Section extends Base {
 
+		protected $_id = '';
+
+		protected $_section = null;
+
 		public function __construct( $slug, $args ) {
 			parent::__construct( $slug, $args );
 			$this->validate_filter = 'wpcd_section_validated';
@@ -43,13 +47,14 @@ if ( ! class_exists( 'WPCD\Components\Section' ) ) {
 				unset( $args['position'] );
 			}
 
-			$slug = $this->slug;
+			$this->_id = $this->slug;
 			if ( 'general' != $parent_panel->slug ) {
-				$slug = $parent_panel->slug . '-' . $slug;
-				$this->args['panel'] = $parent_panel->slug;
+				$this->_id = $parent_panel->slug . '-' . $this->_id;
+				$args['panel'] = $parent_panel->slug;
 			}
 
-			$wp_customize->add_section( new WPCustomizeSection( $wp_customize, $slug, $args ) );
+			$wp_customize->add_section( new WPCustomizeSection( $wp_customize, $this->_id, $args ) );
+			$this->_section = $wp_customize->get_section( $this->_id );
 		}
 
 		/**

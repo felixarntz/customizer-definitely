@@ -18,6 +18,10 @@ if ( ! class_exists( 'WPCD\Components\Panel' ) ) {
 
 	class Panel extends Base {
 
+		protected $_id = '';
+
+		protected $_panel = null;
+
 		public function __construct( $slug, $args ) {
 			parent::__construct( $slug, $args );
 			$this->validate_filter = 'wpcd_panel_validated';
@@ -46,9 +50,10 @@ if ( ! class_exists( 'WPCD\Components\Panel' ) ) {
 				unset( $args['settings_mode'] );
 			}
 
-			$slug = $this->slug;
+			$this->_id = $this->slug;
 
-			$wp_customize->add_panel( new WPCustomizePanel( $wp_customize, $slug, $args ) );
+			$wp_customize->add_panel( new WPCustomizePanel( $wp_customize, $this->_id, $args ) );
+			$this->_panel = $wp_customize->get_panel( $this->_id );
 		}
 
 		/**
