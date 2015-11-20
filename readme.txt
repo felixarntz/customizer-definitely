@@ -10,8 +10,8 @@ Requires at least: 4.2
 Tested up to:      4.2
 Stable tag:        0.5.0
 Version:           0.5.0
-License:           GPL v2 
-License URI:       http://www.gnu.org/licenses/gpl-2.0.html
+License:           GPL v3
+License URI:       http://www.gnu.org/licenses/gpl-3.0.html
 Tags:              wordpress, plugin, definitely, framework, library, developer, admin, backend, structured data, ui, api, cms, customizer
 
 This framework plugin makes adding customizer panels, sections and fields to WordPress very simple, yet flexible.
