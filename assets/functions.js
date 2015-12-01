@@ -1,4 +1,4 @@
-( function( exports, $ ) {
+( function( exports, wp, $ ) {
 
 	function _update_single_style( value, data, slug ) {
 		var style = '';
@@ -38,6 +38,41 @@
 		var parts = slug.replace( ']', '' ).split( '[' );
 
 		return parts.join( '-' );
+	};
+
+	//TODO: create more preprocessor functions and implement their AJAX PHP functions
+
+	exports.preprocessors.post_id_to_field = function( value, callback, args ) {
+		if ( ! value ) {
+			callback( '' );
+			return;
+		}
+
+		wp.ajax.post( 'wpcd-post-id-to-field', {
+			id: parseInt( value, 10 ),
+			mode: args.mode || 'post', // or 'meta' or 'featured_image'
+			field: args.field || 'title'
+		}).done( function( processed ) {
+			callback( processed );
+		}).fail( function() {
+			callback( '' );
+		});
+	};
+
+	exports.preprocessors.attachment_id_to_url = function( value, callback, args ) {
+		if ( ! value ) {
+			callback( '' );
+			return;
+		}
+
+		wp.ajax.post( 'wpcd-attachment-id-to-url', {
+			id: parseInt( value, 10 ),
+			size: args.size || 'full'
+		}).done( function( processed ) {
+			callback( processed );
+		}).fail( function() {
+			callback( '' );
+		});
 	};
 
 	exports.callbacks.update_style = function( value, args, slug ) {
@@ -82,4 +117,4 @@
 		}
 	};
 
-})( wpcd_customizer, jQuery );
+})( wpcd_customizer, wp, jQuery );

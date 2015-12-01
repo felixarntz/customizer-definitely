@@ -75,10 +75,11 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 		}
 
 		public function enqueue_preview_assets( $wp_customize ) {
-			wp_enqueue_script( 'wpcd-functions', App::get_url( 'assets/functions.js' ), array( 'jQuery' ), App::get_info( 'version' ), true );
+			wp_enqueue_script( 'wpcd-functions', App::get_url( 'assets/functions.js' ), array( 'jquery', 'wp-util' ), App::get_info( 'version' ), true );
 			wp_localize_script( 'wpcd-functions', 'wpcd_customizer', array(
 				'settings'				=> $this->get_settings(),
 				'callbacks'				=> new \stdClass(),
+				'preprocessors'			=> new \stdClass(),
 				'util'					=> new \stdClass();
 			) );
 
@@ -118,9 +119,11 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 			$default_timeout = ( isset( $args['callback'] ) && 'update_style' === $args['callback'] ) ? 1000 : 0;
 
 			$args = wp_parse_args( $args, array(
-				'callback'		=> '',
-				'timeout'		=> $default_timeout,
-				'data'			=> array(),
+				'callback'				=> '',
+				'timeout'				=> $default_timeout,
+				'data'					=> array(),
+				'preprocess_callback'	=> '',
+				'preprocess_args'		=> array(),
 			) );
 
 			if ( $args['callback'] ) {
