@@ -125,7 +125,6 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 
 			if ( $args['callback'] ) {
 				switch ( $args['callback'] ) {
-					case 'update_style':
 					case 'update_attr':
 					case 'update_content':
 						if ( ! is_array( $args['data'] ) ) {
@@ -142,6 +141,55 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 								'prefix'		=> '',
 								'suffix'		=> '',
 							) );
+						}
+						break;
+					case 'update_style':
+						if ( ! is_array( $args['data'] ) ) {
+							if ( ! empty( $args['data'] ) ) {
+								$args['data'] = array( $args['data'] );
+							} else {
+								$args['data'] = array();
+							}
+						}
+						for ( $i = 0; $i < count( $args['data'] ); $i++ ) {
+							$args['data'][ $i ] = wp_parse_args( $args['data'][ $i ], array(
+								'selectors'		=> array(),
+								'property'		=> '',
+								'prefix'		=> '',
+								'suffix'		=> '',
+								// either use 'media_query'...
+								'media_query'	=> '',
+								// ...or the following fields
+								'media_type'	=> '',
+								'min_width'		=> '',
+								'max_width'		=> '',
+							) );
+							if ( empty( $args['data'][ $i ]['media_query'] ) ) {
+								$media_query_parts = array();
+
+								if ( in_array( $args['data'][ $i ]['media_type'], array( 'all', 'print', 'screen', 'speech' ) ) ) {
+									$media_query_parts[] = 'only ' . $args['data'][ $i ]['media_type'];
+								}
+								if ( ! empty( $args['data'][ $i ]['min_width'] ) ) {
+									if ( is_numeric( $args['data'][ $i ]['min_width'] ) ) {
+										$args['data'][ $i ]['min_width'] .= 'px';
+									}
+									$media_query_parts[] = '(min-width: ' . $args['data'][ $i ]['min_width'] . ')';
+								}
+								if ( ! empty( $args['data'][ $i ]['max_width'] ) ) {
+									if ( is_numeric( $args['data'][ $i ]['max_width'] ) ) {
+										$args['data'][ $i ]['max_width'] .= 'px';
+									}
+									$media_query_parts[] = '(max-width: ' . $args['data'][ $i ]['max_width'] . ')';
+								}
+
+								if ( count( $media_query_parts ) > 0 ) {
+									$args['data'][ $i ]['media_query'] = '@media ' . implode( ' and ', $media_query_parts );
+								}
+							}
+							unset( $args['data'][ $i ]['media_type'] );
+							unset( $args['data'][ $i ]['min_width'] );
+							unset( $args['data'][ $i ]['max_width'] );
 						}
 						break;
 					default:

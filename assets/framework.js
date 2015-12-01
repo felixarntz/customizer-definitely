@@ -28,6 +28,7 @@
 	};
 
 	exports.bind_setting = function( setting_slug, setting_function, setting_data, setting_timeout ) {
+		//TODO: if setting_function == 'update_style', initialize style tags with initial values
 		if ( 0 < setting_timeout ) {
 			wp.customize( setting_slug, function( value ) {
 				var intent;
