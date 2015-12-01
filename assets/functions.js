@@ -43,13 +43,13 @@
 	exports.callbacks.update_style = function( value, args, slug ) {
 		var sanitized_slug = exports.util.sanitize_slug( slug );
 
+		if ( $( '#wpcd-style-' + sanitized_slug ).length < 1 ) {
+			$( 'head' ).append( '<style type="text/css" id="wpcd-style-' + sanitized_slug + '"></style>' );
+		}
+
+		var style_content = '';
+
 		if ( value ) {
-			if ( $( '#wpcd-style-' + sanitized_slug ).length < 1 ) {
-				$( 'head' ).append( '<style type="text/css" id="wpcd-style-' + sanitized_slug + '"></style>' );
-			}
-
-			var style_content = '';
-
 			for ( var i in args ) {
 				var data = args[ i ];
 
@@ -57,13 +57,9 @@
 					style_content += _update_single_style( value, data, slug );
 				}
 			}
-
-			$( '#wpcd-style-' + sanitized_slug ).text( style_content );
-		} else {
-			if ( $( '#wpcd-style-' + sanitized_slug ).length > 0 ) {
-				$( '#wpcd-style-' + sanitized_slug ).remove();
-			}
 		}
+
+		$( '#wpcd-style-' + sanitized_slug ).text( style_content );
 	};
 
 	exports.callbacks.update_attr = function( value, args, slug ) {
