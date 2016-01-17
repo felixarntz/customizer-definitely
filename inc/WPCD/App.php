@@ -67,42 +67,48 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 			add_action( 'wp_ajax_wpcd_dismiss_notice', array( $this, 'ajax_dismiss_notice' ) );
 		}
 
+		/**
+		 * Sets the current scope.
+		 *
+		 * The scope is an internal identifier. When adding a component, it will be added to the currently active scope.
+		 * Therefore every plugin or theme should define its own unique scope to prevent conflicts.
+		 *
+		 * @since 0.5.0
+		 * @param string $scope the current scope to set
+		 */
 		public function set_scope( $scope ) {
 			ComponentManager::set_scope( $scope );
 		}
 
+		/**
+		 * Adds a toplevel component.
+		 *
+		 * This function should be utilized when using the plugin manually.
+		 * Every component has an `add()` method to add subcomponents to it, however if you want to add toplevel components, use this function.
+		 *
+		 * @since 0.5.0
+		 * @param WPDLib\Components\Base $component the component object to add
+		 * @return WPDLib\Components\Base|WP_Error either the component added or a WP_Error object if an error occurred
+		 */
 		public function add( $component ) {
 			return ComponentManager::add( $component );
 		}
 
+		/**
+		 * Takes an array of hierarchically nested components and adds them.
+		 *
+		 * This function is the general function to add an array of components.
+		 * You should call it from your plugin or theme within the 'wpcd' action.
+		 *
+		 * @since 0.5.0
+		 * @param array $components the components to add
+		 * @param string $scope the scope to add the components to
+		 */
 		public function add_components( $components, $scope = '' ) {
 			$this->set_scope( $scope );
 
 			if ( is_array( $components ) ) {
-				foreach ( $components as $panel_slug => $panel_args ) {
-					$panel = ComponentManager::add( new Panel( $panel_slug, $panel_args ) );
-					if ( is_wp_error( $panel ) ) {
-						self::doing_it_wrong( __METHOD__, $panel->get_error_message(), '0.5.0' );
-					} else {
-						if ( isset( $panel_args['sections'] ) && is_array( $panel_args['sections'] ) ) {
-							foreach ( $panel_args['sections'] as $section_slug => $section_args ) {
-								$section = $panel->add( new Section( $section_slug, $section_args ) );
-								if ( is_wp_error( $section ) ) {
-									self::doing_it_wrong( __METHOD__, $section->get_error_message(), '0.5.0' );
-								} else {
-									if  ( isset( $section_args['fields'] ) && is_array( $section_args['fields'] ) ) {
-										foreach ( $section_args['fields'] as $field_slug => $field_args ) {
-											$field = $section->add( new Field( $field_slug, $field_args ) );
-											if ( is_wp_error( $field ) ) {
-												self::doing_it_wrong( __METHOD__, $field->get_error_message(), '0.5.0' );
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
+				$this->add_panels( $components );
 			}
 		}
 
@@ -135,6 +141,15 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 			}
 		}
 
+		/**
+		 * Callback function to run after a panel has been validated.
+		 *
+		 * @internal
+		 * @since 0.5.0
+		 * @param array $args the panel arguments
+		 * @param WPCD\Components\Panel $panel the current panel object
+		 * @return array the adjusted panel arguments
+		 */
 		public function panel_validated( $args, $panel ) {
 			if ( isset( $args['sections'] ) ) {
 				unset( $args['sections'] );
@@ -142,6 +157,15 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 			return $args;
 		}
 
+		/**
+		 * Callback function to run after a section has been validated.
+		 *
+		 * @internal
+		 * @since 0.5.0
+		 * @param array $args the section arguments
+		 * @param WPCD\Components\Section $section the current section object
+		 * @return array the adjusted section arguments
+		 */
 		public function section_validated( $args, $section ) {
 			if ( isset( $args['fields'] ) ) {
 				unset( $args['fields'] );
@@ -232,6 +256,60 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 			delete_option( 'customizer_definitely_notice' );
 
 			wp_send_json_success();
+		}
+
+		/**
+		 * Adds panels and their subcomponents.
+		 *
+		 * @internal
+		 * @since 0.5.0
+		 * @param array $panels the panels to add as $panel_slug => $panel_args
+		 */
+		protected function add_panels( $panels ) {
+			foreach ( $panels as $panel_slug => $panel_args ) {
+				$panel = $this->add( new Panel( $panel_slug, $panel_args ) );
+				if ( is_wp_error( $panel ) ) {
+					self::doing_it_wrong( __METHOD__, $panel->get_error_message(), '0.5.0' );
+				} elseif ( isset( $panel_args['sections'] ) && is_array( $panel_args['sections'] ) ) {
+					$this->add_sections( $panel_args['sections'], $panel );
+				}
+			}
+		}
+
+		/**
+		 * Adds sections and their subcomponents.
+		 *
+		 * @internal
+		 * @since 0.5.0
+		 * @param array $sections the sections to add as $section_slug => $section_args
+		 * @param WPCD\Components\Panel $panel the post type to add the sections to
+		 */
+		protected function add_sections( $sections, $panel ) {
+			foreach ( $sections as $section_slug => $section_args ) {
+				$section = $panel->add( new Section( $section_slug, $section_args ) );
+				if ( is_wp_error( $section ) ) {
+					self::doing_it_wrong( __METHOD__, $section->get_error_message(), '0.5.0' );
+				} elseif ( isset( $section_args['fields'] ) && is_array( $section_args['fields'] ) ) {
+					$this->add_fields( $section_args['fields'], $section );
+				}
+			}
+		}
+
+		/**
+		 * Adds fields.
+		 *
+		 * @internal
+		 * @since 0.5.0
+		 * @param array $fields the fields to add as $field_slug => $field_args
+		 * @param WPCD\Components\Section $section the metabox to add the fields to
+		 */
+		protected function add_fields( $fields, $section ) {
+			foreach ( $fields as $field_slug => $field_args ) {
+				$field = $section->add( new Field( $field_slug, $field_args ) );
+				if ( is_wp_error( $field ) ) {
+					self::doing_it_wrong( __METHOD__, $field->get_error_message(), '0.5.0' );
+				}
+			}
 		}
 
 		/**
