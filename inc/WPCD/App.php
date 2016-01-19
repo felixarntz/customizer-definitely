@@ -12,6 +12,7 @@ use WPCD\Components\Panel as Panel;
 use WPCD\Components\Section as Section;
 use WPCD\Components\Field as Field;
 use WPDLib\Components\Manager as ComponentManager;
+use WPDLib\FieldTypes\Manager as FieldManager;
 use LaL_WP_Plugin as Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -52,6 +53,8 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 		 * @since 0.5.0
 		 */
 		protected function run() {
+			FieldManager::init();
+
 			Customizer::instance();
 
 			// use after_setup_theme action so it is initialized as soon as possible, but also so that both plugins and themes can use the action
