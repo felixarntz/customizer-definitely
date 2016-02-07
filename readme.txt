@@ -6,8 +6,8 @@ Author URI:        http://leaves-and-love.net
 Author:            Felix Arntz
 Donate link:       http://leaves-and-love.net/wordpress-plugins/
 Contributors:      flixos90
-Requires at least: 4.2 
-Tested up to:      4.2
+Requires at least: 4.2
+Tested up to:      4.4.2
 Stable tag:        0.5.0
 Version:           0.5.0
 License:           GPL v3

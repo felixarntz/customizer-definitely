@@ -9,7 +9,6 @@ Author URI: http://leaves-and-love.net
 License: GNU General Public License v3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Text Domain: customizer-definitely
-Domain Path: /languages/
 Tags: wordpress, plugin, definitely, framework, library, developer, admin, backend, structured data, ui, api, cms, customizer
 */
 /**
@@ -39,13 +38,14 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 }
 
 LaL_WP_Plugin_Loader::load_plugin( array(
-	'slug'				=> 'customizer-definitely',
-	'name'				=> 'Customizer Definitely',
-	'version'			=> '0.5.0',
-	'main_file'			=> __FILE__,
-	'namespace'			=> 'WPCD',
-	'textdomain'		=> 'customizer-definitely',
+	'slug'					=> 'customizer-definitely',
+	'name'					=> 'Customizer Definitely',
+	'version'				=> '0.5.0',
+	'main_file'				=> __FILE__,
+	'namespace'				=> 'WPCD',
+	'textdomain'			=> 'customizer-definitely',
+	'use_language_packs'	=> true,
 ), array(
-	'phpversion'		=> '5.3.0',
-	'wpversion'			=> '4.2',
+	'phpversion'			=> '5.3.0',
+	'wpversion'				=> '4.2',
 ) );

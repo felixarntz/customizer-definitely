@@ -17,7 +17,6 @@ module.exports = function(grunt) {
 						'License: <%= pkg.license.name %>\n' +
 						'License URI: <%= pkg.license.url %>\n' +
 						'Text Domain: customizer-definitely\n' +
-						'Domain Path: /languages/\n' +
 						'Tags: <%= pkg.keywords.join(", ") %>\n' +
 						'*/',
 		fileheader:		'/**\n' +
@@ -32,9 +31,6 @@ module.exports = function(grunt) {
 			],
 			functions: [
 				'assets/functions.min.js'
-			],
-			translation: [
-				'languages/customizer-definitely.pot'
 			]
 		},
 
@@ -108,34 +104,6 @@ module.exports = function(grunt) {
 					to: '<%= fileheader %>'
 				}]
 			}
-		},
-
-		makepot: {
-			translation: {
-				options: {
-					mainFile: 'customizer-definitely.php',
-					domainPath: '/languages',
-					exclude: [ 'vendor/.*' ],
-					potComments: 'Copyright (c) 2015-<%= grunt.template.today("yyyy") %> <%= pkg.author.name %>',
-					potFilename: 'customizer-definitely.pot',
-					potHeaders: {
-						'language-team': '<%= pkg.author.name %> <<%= pkg.author.email %>>',
-						'last-translator': '<%= pkg.author.name %> <<%= pkg.author.email %>>',
-						'project-id-version': '<%= pkg.name %> <%= pkg.version %>',
-						'report-msgid-bugs-to': '<%= pkg.homepage %>',
-						'x-generator': 'grunt-wp-i18n 0.5.3',
-						'x-poedit-basepath': '.',
-						'x-poedit-language': 'English',
-						'x-poedit-country': 'UNITED STATES',
-						'x-poedit-sourcecharset': 'uft-8',
-						'x-poedit-keywordslist': '__;_e;_x:1,2c;_ex:1,2c;_n:1,2; _nx:1,2,4c;_n_noop:1,2;_nx_noop:1,2,3c;esc_attr__; esc_html__;esc_attr_e; esc_html_e;esc_attr_x:1,2c; esc_html_x:1,2c;',
-						'x-poedit-bookmars': '',
-						'x-poedit-searchpath-0': '.',
-						'x-textdomain-support': 'yes'
-					},
-					type: 'wp-plugin'
-				}
-			}
 		}
 
  	});
@@ -145,7 +113,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-banner');
 	grunt.loadNpmTasks('grunt-text-replace');
-	grunt.loadNpmTasks('grunt-wp-i18n');
 
 	grunt.registerTask('framework', [
 		'clean:framework',
@@ -159,11 +126,6 @@ module.exports = function(grunt) {
 		'uglify:functions'
 	]);
 
-	grunt.registerTask('translation', [
-		'clean:translation',
-		'makepot:translation'
-	]);
-
 	grunt.registerTask('plugin', [
 		'usebanner',
 		'replace:version',
@@ -172,14 +134,12 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('default', [
 		'framework',
-		'functions',
-		'translation'
+		'functions'
 	]);
 
 	grunt.registerTask('build', [
 		'framework',
 		'functions',
-		'translation',
 		'plugin'
 	]);
 };
