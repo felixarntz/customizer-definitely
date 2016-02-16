@@ -56,6 +56,8 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 			FieldManager::init();
 
 			Customizer::instance();
+			AJAX::instance();
+			CSSGenerator::instance();
 
 			// use after_setup_theme action so it is initialized as soon as possible, but also so that both plugins and themes can use the action
 			add_action( 'after_setup_theme', array( $this, 'init' ), 3 );
@@ -224,6 +226,31 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 					self::doing_it_wrong( __METHOD__, $field->get_error_message(), '0.5.0' );
 				}
 			}
+		}
+
+		/**
+		 * Handles plugin activation.
+		 *
+		 * @since 0.5.0
+		 * @return bool true if all processes were successful, otherwise false
+		 */
+		public static function activate() {
+			CSSGenerator::instance()->add_rewrite_rule();
+			add_action( 'shutdown', 'flush_rewrite_rules' );
+
+			return true;
+		}
+
+		/**
+		 * Handles plugin deactivation.
+		 *
+		 * @since 0.5.0
+		 * @return bool true if all processes were successful, otherwise false
+		 */
+		public static function deactivate() {
+			add_action( 'shutdown', 'flush_rewrite_rules' );
+
+			return true;
 		}
 
 		/**

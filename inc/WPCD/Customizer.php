@@ -78,9 +78,12 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 			wp_enqueue_script( 'wpcd-functions', App::get_url( 'assets/functions.js' ), array( 'jquery', 'wp-util' ), App::get_info( 'version' ), true );
 			wp_localize_script( 'wpcd-functions', 'wpcd_customizer', array(
 				'settings'				=> $this->get_settings(),
-				'callbacks'				=> new \stdClass(),
-				'preprocessors'			=> new \stdClass(),
-				'util'					=> new \stdClass();
+				'update_callbacks'		=> new \stdClass(),
+				'preprocess_callbacks'	=> new \stdClass(),
+				'util'					=> array(
+					'update_nonce'			=> wp_create_nonce( 'wpcd-customize-update' ),
+					'preprocess_nonce'		=> wp_create_nonce( 'wpcd-customize-preprocess' ),
+				);
 			) );
 
 			$main_dependencies = array( 'customize-base', 'wpcd-functions' );
@@ -111,34 +114,59 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 			return $settings;
 		}
 
-		public function validate_preview_args( $args ) {
+		public function validate_preview_args( $args, $field_type, $field ) {
 			if ( ! is_array( $args ) ) {
 				$args = array();
 			}
 
-			$default_timeout = ( isset( $args['callback'] ) && 'update_style' === $args['callback'] ) ? 1000 : 0;
+			$default_timeout = ( isset( $args['update_callback'] ) && 'update_style' === $args['update_callback'] ) ? 1000 : 0;
+
+			$default_preprocess_callback = '';
+			switch ( $field_type ) {
+				case 'media':
+					$default_preprocess_callback = 'get_attachment_url';
+					break;
+				case 'number':
+				case 'range':
+					$default_preprocess_callback = 'number_format_i18n';
+					break;
+				case 'datetime':
+				case 'date':
+				case 'time':
+					$default_preprocess_callback = 'date_i18n';
+					break;
+				case 'wysiwyg':
+					$default_preprocess_callback = 'content_format';
+					break;
+				case 'multibox':
+				case 'multiselect':
+				case 'radio':
+				case 'select':
+					$default_preprocess_callback = 'value_to_label';
+					break;
+				default:
+					$default_preprocess_callback = 'do_not_process';
+			}
 
 			$args = wp_parse_args( $args, array(
-				'callback'				=> '',
+				'update_callback'		=> '',
+				'update_args'			=> array(),
 				'timeout'				=> $default_timeout,
-				'data'					=> array(),
 				'preprocess_callback'	=> '',
 				'preprocess_args'		=> array(),
 			) );
 
-			if ( $args['callback'] ) {
-				switch ( $args['callback'] ) {
+			if ( $args['update_callback'] ) {
+				switch ( $args['update_callback'] ) {
 					case 'update_attr':
 					case 'update_content':
-						if ( ! is_array( $args['data'] ) ) {
-							if ( ! empty( $args['data'] ) ) {
-								$args['data'] = array( $args['data'] );
-							} else {
-								$args['data'] = array();
-							}
+						if ( ! is_array( $args['update_args'] ) ) {
+							$args['update_args'] = array();
+						} elseif ( 0 < count( $args['update_args'] ) && ! isset( $args['update_args'][0] ) ) {
+							$args['update_args'] = array( $args['update_args'] );
 						}
-						for ( $i = 0; $i < count( $args['data'] ); $i++ ) {
-							$args['data'][ $i ] = wp_parse_args( $args['data'][ $i ], array(
+						for ( $i = 0; $i < count( $args['update_args'] ); $i++ ) {
+							$args['update_args'][ $i ] = wp_parse_args( $args['update_args'][ $i ], array(
 								'selectors'		=> array(),
 								'property'		=> '',
 								'prefix'		=> '',
@@ -147,15 +175,13 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 						}
 						break;
 					case 'update_style':
-						if ( ! is_array( $args['data'] ) ) {
-							if ( ! empty( $args['data'] ) ) {
-								$args['data'] = array( $args['data'] );
-							} else {
-								$args['data'] = array();
-							}
+						if ( ! is_array( $args['update_args'] ) ) {
+							$args['update_args'] = array();
+						} elseif ( 0 < count( $args['update_args'] ) && ! isset( $args['update_args'][0] ) ) {
+							$args['update_args'] = array( $args['update_args'] );
 						}
-						for ( $i = 0; $i < count( $args['data'] ); $i++ ) {
-							$args['data'][ $i ] = wp_parse_args( $args['data'][ $i ], array(
+						for ( $i = 0; $i < count( $args['update_args'] ); $i++ ) {
+							$args['update_args'][ $i ] = wp_parse_args( $args['update_args'][ $i ], array(
 								'selectors'		=> array(),
 								'property'		=> '',
 								'prefix'		=> '',
@@ -167,36 +193,84 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 								'min_width'		=> '',
 								'max_width'		=> '',
 							) );
-							if ( empty( $args['data'][ $i ]['media_query'] ) ) {
+							if ( empty( $args['update_args'][ $i ]['media_query'] ) ) {
 								$media_query_parts = array();
 
-								if ( in_array( $args['data'][ $i ]['media_type'], array( 'all', 'print', 'screen', 'speech' ) ) ) {
-									$media_query_parts[] = 'only ' . $args['data'][ $i ]['media_type'];
+								if ( in_array( $args['update_args'][ $i ]['media_type'], array( 'all', 'print', 'screen', 'speech' ) ) ) {
+									$media_query_parts[] = 'only ' . $args['update_args'][ $i ]['media_type'];
 								}
-								if ( ! empty( $args['data'][ $i ]['min_width'] ) ) {
-									if ( is_numeric( $args['data'][ $i ]['min_width'] ) ) {
-										$args['data'][ $i ]['min_width'] .= 'px';
+								if ( ! empty( $args['update_args'][ $i ]['min_width'] ) ) {
+									if ( is_numeric( $args['update_args'][ $i ]['min_width'] ) ) {
+										$args['update_args'][ $i ]['min_width'] .= 'px';
 									}
-									$media_query_parts[] = '(min-width: ' . $args['data'][ $i ]['min_width'] . ')';
+									$media_query_parts[] = '(min-width: ' . $args['update_args'][ $i ]['min_width'] . ')';
 								}
-								if ( ! empty( $args['data'][ $i ]['max_width'] ) ) {
-									if ( is_numeric( $args['data'][ $i ]['max_width'] ) ) {
-										$args['data'][ $i ]['max_width'] .= 'px';
+								if ( ! empty( $args['update_args'][ $i ]['max_width'] ) ) {
+									if ( is_numeric( $args['update_args'][ $i ]['max_width'] ) ) {
+										$args['update_args'][ $i ]['max_width'] .= 'px';
 									}
-									$media_query_parts[] = '(max-width: ' . $args['data'][ $i ]['max_width'] . ')';
+									$media_query_parts[] = '(max-width: ' . $args['update_args'][ $i ]['max_width'] . ')';
 								}
 
 								if ( count( $media_query_parts ) > 0 ) {
-									$args['data'][ $i ]['media_query'] = '@media ' . implode( ' and ', $media_query_parts );
+									$args['update_args'][ $i ]['media_query'] = '@media ' . implode( ' and ', $media_query_parts );
 								}
 							}
-							unset( $args['data'][ $i ]['media_type'] );
-							unset( $args['data'][ $i ]['min_width'] );
-							unset( $args['data'][ $i ]['max_width'] );
+							unset( $args['update_args'][ $i ]['media_type'] );
+							unset( $args['update_args'][ $i ]['min_width'] );
+							unset( $args['update_args'][ $i ]['max_width'] );
 						}
 						break;
 					default:
-						$args['data'] = apply_filters( 'wpcd_validate_' . $args['callback'] . '_data', $args['data'] );
+						$args['update_args'] = apply_filters( 'wpcd_validate_' . $args['update_callback'] . '_update_args', $args['update_args'] );
+				}
+			}
+
+			if ( $args['preprocess_callback'] ) {
+				switch ( $args['preprocess_callback'] ) {
+					case 'get_attachment_url':
+						$args['preprocess_args'] = wp_parse_args( $args['preprocess_args'], array(
+							'size'		=> 'full',
+						) );
+						break;
+					case 'number_format_i18n':
+						$default_decimals = 0;
+						if ( is_float( $field->step ) ) {
+							$default_decimals = strlen( explode( '.', '' . $field->step )[1] );
+						}
+						$args['preprocess_args'] = wp_parse_args( $args['preprocess_args'], array(
+							'decimals'		=> $default_decimals,
+						) );
+						break;
+					case 'date_i18n':
+						$default_datetime_format = '';
+						if ( 'time' === $field_type ) {
+							$default_datetime_format = get_option( 'time_format' );
+						} elseif ( 'date' === $field_type ) {
+							$default_datetime_format = get_option( 'date_format' );
+						} else {
+							$default_datetime_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+						}
+						$args['preprocess_args'] = wp_parse_args( $args['preprocess_args'], array(
+							'format'		=> $default_datetime_format,
+						) );
+						break;
+					case 'content_format':
+						$args['preprocess_args'] = wp_parse_args( $args['preprocess_args'], array(
+							'filters'	=> array( 'wpautop', 'do_shortcode' ),
+						) );
+						break;
+					case 'value_to_label':
+						$args['preprocess_args'] = wp_parse_args( $args['preprocess_args'], array(
+							'mode'		=> 'label',
+							'labels'	=> $field->options,
+						) );
+						break;
+					case 'do_not_process':
+						$args['preprocess_args'] = array();
+						break;
+					default:
+						$args['preprocess_args'] = apply_filters( 'wpcd_validate_' . $args['preprocess_callback'] . '_preprocess_args', $args['preprocess_args'] );
 				}
 			}
 

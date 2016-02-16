@@ -6,53 +6,59 @@
 		for ( var i in settings_keys ) {
 			var setting_slug = settings_keys[ i ];
 			var setting_args = exports.settings[ setting_slug ];
-			var setting_function;
-			var setting_timeout = 0;
-			var setting_preprocess_function;
-			var setting_preprocess_args = {};
 
-			if ( typeof setting_args.callback !== 'undefined' ) {
-				if ( typeof setting_args.callback === 'string' && typeof exports.callbacks[ setting_args.callback ] === 'function' ) {
-					setting_function = exports.callbacks[ setting_args.callback ];
-				} else if ( typeof setting_args.callback === 'function' ) {
-					setting_function = setting_args.callback;
+			var update_callback;
+			var update_args = {};
+			var timeout = 0;
+			var preprocess_callback;
+			var preprocess_args = {};
+
+			if ( typeof setting_args.update_callback !== 'undefined' ) {
+				if ( typeof setting_args.update_callback === 'string' && typeof exports.update_callbacks[ setting_args.update_callback ] === 'function' ) {
+					update_callback = exports.update_callbacks[ setting_args.update_callback ];
+				} else if ( typeof setting_args.update_callback === 'function' ) {
+					update_callback = setting_args.update_callback;
 				}
+			}
+
+			if ( typeof setting_args.update_args === 'object' ) {
+				update_args = setting_args.update_args;
 			}
 
 			if ( typeof setting_args.timeout !== 'undefined' ) {
-				setting_timeout = parseInt( setting_args.timeout, 10 );
+				timeout = parseInt( setting_args.timeout, 10 );
 			}
 
 			if ( typeof setting_args.preprocess_callback !== 'undefined' ) {
-				if ( typeof setting_args.preprocess_callback === 'string' && typeof exports.callbacks[ setting_args.preprocess_callback ] === 'function' ) {
-					setting_preprocess_function = exports.preprocessors[ setting_args.preprocess_callback ];
+				if ( typeof setting_args.preprocess_callback === 'string' && typeof exports.preprocess_callbacks[ setting_args.preprocess_callback ] === 'function' ) {
+					preprocess_callback = exports.preprocess_callbacks[ setting_args.preprocess_callback ];
 				} else if ( typeof setting_args.preprocess_callback === 'function' ) {
-					setting_preprocess_function = setting_args.preprocess_callback;
+					preprocess_callback = setting_args.preprocess_callback;
 				}
 			}
 
-			if ( typeof setting_args.preprocess_args === 'object' && typeof setting_args.preprocess_args.length === 'undefined' ) {
-				setting_preprocess_args = setting_args.preprocess_args;
+			if ( typeof setting_args.preprocess_args === 'object' ) {
+				preprocess_args = setting_args.preprocess_args;
 			}
 
-			if ( setting_function ) {
-				exports.bind_setting( setting_slug, setting_function, setting_args.data, setting_timeout, setting_preprocess_function, setting_preprocess_args );
+			if ( update_callback ) {
+				exports.bind_setting( setting_slug, update_callback, update_args, timeout, preprocess_callback, preprocess_args );
 			}
 		}
 	};
 
-	exports.bind_setting = function( setting_slug, setting_function, setting_data, setting_timeout, setting_preprocess_function, setting_preprocess_args ) {
+	exports.bind_setting = function( setting_slug, update_callback, update_args, timeout, preprocess_callback, preprocess_args ) {
 		function preprocess_and_update( setting_value ) {
-			if ( setting_preprocess_function ) {
-				setting_preprocess_function.call( setting_value, function( val ) {
-					exports.update_setting( setting_slug, setting_function, val, setting_data );
-				}, setting_preprocess_args );
+			if ( preprocess_callback ) {
+				preprocess_callback.call( setting_value, function( val ) {
+					exports.update_setting( setting_slug, update_callback, val, update_args );
+				}, preprocess_args );
 			} else {
-				exports.update_setting( setting_slug, setting_function, setting_value, setting_data );
+				exports.update_setting( setting_slug, update_callback, setting_value, update_args );
 			}
 		}
 
-		if ( 0 < setting_timeout ) {
+		if ( 0 < timeout ) {
 			wp.customize( setting_slug, function( value ) {
 				var intent;
 
@@ -63,7 +69,7 @@
 
 					intent = window.setTimeout( function() {
 						preprocess_and_update( to );
-					}, setting_timeout );
+					}, timeout );
 				});
 			});
 		} else {

@@ -14,13 +14,14 @@ use WPDLib\FieldTypes\Manager as FieldManager;
 use WPDLib\Util\Error as UtilError;
 use WP_Error as WPError;
 use WP_Customize_Setting as WPCustomizeSetting;
-use WP_Customize_Control as WPCustomizeControl;
+/*use WP_Customize_Control as WPCustomizeControl;
 use WP_Customize_Color_Control as WPCustomizeColorControl;
 use WP_Customize_Media_Control as WPCustomizeMediaControl;
 use WPCD\Controls\NumberControl as WPCustomizeNumberControl;
 use WPCD\Controls\DatetimeControl as WPCustomizeDatetimeControl;
 use WPCD\Controls\WysiwygControl as WPCustomizeWysiwygControl;
-use WPCD\Controls\MultiControl as WPCustomizeMultiControl;
+use WPCD\Controls\MultiControl as WPCustomizeMultiControl;*/
+use WPCD\CustomizeControl as WPCustomizeControl;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
@@ -122,7 +123,7 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 			$wp_customize->add_setting( new WPCustomizeSetting( $wp_customize, $this->_id, $setting_args ) );
 			$this->_setting = $wp_customize->get_setting( $this->_id );
 
-			switch ( $this->args['type'] ) {
+			/*switch ( $this->args['type'] ) {
 				case 'number':
 				case 'range':
 					$wp_customize->add_control( new WPCustomizeNumberControl( $wp_customize, $this->_id, $control_args ) );
@@ -150,8 +151,9 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 					break;
 				default:
 					$wp_customize->add_control( new WPCustomizeControl( $wp_customize, $this->_id, $control_args ) );
-			}
+			}*/
 
+			$wp_customize->add_control( new WPCustomizeControl( $wp_customize, $this->_id, $control_args, $this->_field ) );
 			$this->_control = $wp_customize->get_control( $this->_id );
 		}
 
@@ -172,6 +174,7 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 			$result = $this->_field->validate( $setting );
 			if ( is_wp_error( $result ) ) {
 				return null;
+				return $result;
 			}
 			return $result;
 		}
@@ -205,16 +208,6 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 					$this->args['mode'] = $parent->get_parent()->mode;
 				}
 
-				$this->args['preview_args'] = Customizer::instance()->validate_preview_args( $this->args['preview_args'] );
-
-				if ( null === $this->args['transport'] ) {
-					if ( $this->args['preview_args']['callback'] ) {
-						$this->args['transport'] = 'postMessage';
-					} else {
-						$this->args['transport'] = 'refresh';
-					}
-				}
-
 				if ( is_array( $this->args['class'] ) ) {
 					$this->args['class'] = implode( ' ', $this->args['class'] );
 				}
@@ -231,11 +224,21 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 				}
 
 				$this->_field = FieldManager::get_instance( $this->args );
-				if ( $this->_field === null ) {
+				if ( null === $this->_field ) {
 					return new UtilError( 'no_valid_field_type', sprintf( __( 'The field type %1$s assigned to the field component %2$s is not a valid field type.', 'customizer-definitely' ), $this->args['type'], $this->slug ), '', ComponentManager::get_scope() );
 				}
 				if ( null === $this->args['default'] ) {
 					$this->args['default'] = $this->_field->validate();
+				}
+
+				$this->args['preview_args'] = Customizer::instance()->validate_preview_args( $this->args['preview_args'], $this->args['type'], $this->_field );
+
+				if ( null === $this->args['transport'] ) {
+					if ( $this->args['preview_args']['process_callback'] ) {
+						$this->args['transport'] = 'postMessage';
+					} else {
+						$this->args['transport'] = 'refresh';
+					}
 				}
 			}
 
