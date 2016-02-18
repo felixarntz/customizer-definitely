@@ -62,16 +62,27 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 		}
 
 		public function register_components( $wp_customize ) {
+			$css_generator = CSSGenerator::instance();
+
 			$panels = ComponentManager::get( '*', 'WPCD\Components\Panel' );
 			foreach ( $panels as $panel ) {
 				$panel->register( $wp_customize );
+				if ( 'general' !== $panel->slug ) {
+					add_action( 'update_option_' . $panel->_id, array( $css_generator, 'set_last_modified' ) );
+				}
 				foreach ( $panel->get_children() as $section ) {
 					$section->register( $wp_customize, $panel );
 					foreach ( $section->get_children() as $field ) {
 						$field->register( $wp_customize, $section, $panel );
+						if ( 'general' === $panel->slug ) {
+							add_action( 'update_option_' . $field->_id, array( $css_generator, 'set_last_modified' ) );
+						}
 					}
 				}
 			}
+
+			$theme = get_option( 'stylesheet' );
+			add_action( 'update_option_theme_mods_' . $theme, array( $css_generator, 'set_last_modified' ) );
 		}
 
 		public function enqueue_preview_assets( $wp_customize ) {

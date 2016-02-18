@@ -57,10 +57,10 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 		}
 
 		public function register( $wp_customize, $parent_section = null, $parent_panel = null ) {
-			if ( $parent_section === null ) {
+			if ( null === $parent_section ) {
 				$parent_section = $this->get_parent();
 			}
-			if ( $parent_panel === null ) {
+			if ( null === $parent_panel ) {
 				$parent_panel = $parent_section->get_parent();
 			}
 
@@ -254,6 +254,14 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 		 * @return array
 		 */
 		protected function get_defaults() {
+			$parent_section = $this->get_parent();
+			$parent_panel = $parent_section->get_parent();
+
+			$default_mode = 'theme_mod';
+			if ( null !== $parent_panel->settings_mode ) {
+				$default_mode = $parent_panel->settings_mode;
+			}
+
 			$defaults = array(
 				'title'					=> __( 'Field title', 'customizer-definitely' ),
 				'description'			=> '',
@@ -262,7 +270,7 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 				'default'				=> null,
 				'required'				=> false,
 				'position'				=> null,
-				'mode'					=> 'theme_mod',
+				'mode'					=> $default_mode,
 				'transport'				=> null,
 				'preview_args'			=> array(),
 				'capability'			=> null,

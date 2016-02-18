@@ -101,7 +101,7 @@ if ( ! class_exists( 'WPCD\Components\Panel' ) ) {
 				'position'				=> null,
 				'theme_supports'		=> null,
 				'mode'					=> null,
-				'settings_mode'			=> null, //TODO: what is this? old?
+				'settings_mode'			=> null,
 			);
 
 			/**

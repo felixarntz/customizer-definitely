@@ -154,10 +154,30 @@ if ( ! class_exists( 'WPCD\CSSGenerator' ) ) {
 			if ( ! headers_sent() ) {
 				$filename = $this->get_customizer_file_name();
 
-				header( ( ( isset( $_SERVER['SERVER_PROTOCOL'] ) && $_SERVER['SERVER_PROTOCOL'] !== '' ) ? sanitize_text_field( $_SERVER['SERVER_PROTOCOL'] ) : 'HTTP/1.1' ) . ' 200 OK', true, 200 );
+				// set content-specific headers
 				header( 'X-Robots-Tag: noindex, follow', true );
 				header( 'Content-Type: text/css' );
 				header( 'Content-Disposition: inline; filename="' . $filename . '"' );
+
+				// set cache headers
+				$last_modified = $this->get_last_modified();
+				if ( ! $last_modified ) {
+					$last_modified = $this->set_last_modified();
+				}
+				$gmt = gmdate( 'r', $last_modified );
+				$etag = md5( $last_modified . $filename );
+				header( 'Cache-Control: public' );
+				header( 'ETag: "' . $etag . '"' );
+				header( 'Last-Modified: ' . $gmt );
+
+				// set HTTP status
+				$server_protocol = ( isset( $_SERVER['SERVER_PROTOCOL'] ) && '' !== $_SERVER['SERVER_PROTOCOL'] ) ? sanitize_text_field( $_SERVER['SERVER_PROTOCOL'] ) : 'HTTP/1.1';
+				if ( isset( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ) && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $gmt || isset( $_SERVER['HTTP_IF_NONE_MATCH'] ) && str_replace( '"', '', stripslashes( $_SERVER['HTTP_IF_NONE_MATCH'] ) ) == $etag ) {
+					header( $server_protocol . ' 304 Not Modified', true, 304 );
+					die();
+				} else {
+					header( $server_protocol . ' 200 OK', true, 200 );
+				}
 			}
 
 			$this->print_customizer_styles( false );
@@ -189,6 +209,16 @@ if ( ! class_exists( 'WPCD\CSSGenerator' ) ) {
 
 		public function enqueue_customizer_styles() {
 			wp_enqueue_style( 'wpcd-customizer-styles', $this->get_customizer_file_url() );
+		}
+
+		public function set_last_modified() {
+			$last_modified = time();
+			update_option( 'wpcd_customizer_styles_last_modified', $last_modified );
+			return $last_modified;
+		}
+
+		public function get_last_modified() {
+			return (int) get_option( 'wpcd_customizer_styles_last_modified' );
 		}
 
 		private function print_field_styles( $value, $args ) {

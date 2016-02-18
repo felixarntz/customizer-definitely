@@ -248,6 +248,8 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 		 * @return bool true if all processes were successful, otherwise false
 		 */
 		public static function deactivate() {
+			delete_option( 'wpcd_customizer_styles_last_modified' );
+
 			add_action( 'shutdown', 'flush_rewrite_rules' );
 
 			return true;
