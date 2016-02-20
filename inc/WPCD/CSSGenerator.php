@@ -64,7 +64,7 @@ if ( ! class_exists( 'WPCD\CSSGenerator' ) ) {
 			add_filter( 'redirect_canonical', array( $this, 'fix_canonical' ), 10, 1 );
 
 			if ( is_customize_preview() ) {
-				add_action( 'wp_head', array( $this, 'print_customizer_styles' ) );
+				add_action( 'wp_head', array( $this, 'print_customizer_styles' ), 10, 0 );
 			} else {
 				add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_customizer_styles' ) );
 			}
@@ -194,6 +194,7 @@ if ( ! class_exists( 'WPCD\CSSGenerator' ) ) {
 						$preview_args = $field->preview_args;
 						if ( 'update_style' === $preview_args['update_callback'] ) {
 							$value = wpcd_get_customizer_setting( $panel->slug, $field->slug );
+							$value = $this->preprocess_customizer_setting( $value, $preview_args['preprocess_callback'], $preview_args['preprocess_args'] );
 							if ( $wrap_style_tags ) {
 								echo '<style type="text/css" id="wpcd-customizer-style-' . $this->sanitize_id( $field->_id ) . '">';
 							}
@@ -205,6 +206,68 @@ if ( ! class_exists( 'WPCD\CSSGenerator' ) ) {
 					}
 				}
 			}
+		}
+
+		public function preprocess_customizer_setting( $value, $callback, $args ) {
+			$preprocessed = '';
+
+			switch ( $callback ) {
+				case 'post_id_to_field':
+					if ( ! empty( $value ) ) {
+						$args['id'] = $value;
+						$preprocessed = AJAX::manual_request( 'wpcd-post-id-to-field', $args );
+					}
+					break;
+				case 'get_attachment_url':
+					if ( ! empty( $value ) ) {
+						$args['id'] = $value;
+						$preprocessed = AJAX::manual_request( 'wpcd-get-attachment-url', $args );
+					}
+					break;
+				case 'number_format_i18n':
+					if ( ! empty( $value ) ) {
+						$args['number'] = $value;
+						$preprocessed = AJAX::manual_request( 'wpcd-number-format-i18n', $args );
+					}
+					break;
+				case 'date_i18n':
+					if ( ! empty( $value ) ) {
+						$args['date'] = $value;
+						$preprocessed = AJAX::manual_request( 'wpcd-date-i18n', $args );
+					}
+					break;
+				case 'content_format':
+					if ( ! empty( $value ) ) {
+						$args['content'] = $value;
+						$preprocessed = AJAX::manual_request( 'wpcd-content-format', $args );
+					}
+					break;
+				case 'value_to_label':
+					$preprocessed = array();
+					if ( ! is_array( $value ) ) {
+						$value = array( $value );
+					}
+					foreach ( $value as $v ) {
+						if ( 'label' === $args['mode'] && isset( $args['labels'][ $v ] ) ) {
+							$preprocessed[] = $args['labels'][ $v ];
+						} else {
+							$preprocessed[] = $v;
+						}
+					}
+					$preprocessed = implode( ', ', $preprocessed );
+					break;
+				case 'do_not_process':
+					$preprocessed = $value;
+					break;
+				default:
+					$preprocessed = apply_filters( 'wpcd_preprocess_' . $callback . '_value', $value, $args );
+			}
+
+			if ( is_wp_error( $preprocessed ) ) {
+				$preprocessed = '';
+			}
+
+			return $preprocessed;
 		}
 
 		public function enqueue_customizer_styles() {
@@ -223,7 +286,6 @@ if ( ! class_exists( 'WPCD\CSSGenerator' ) ) {
 
 		private function print_field_styles( $value, $args ) {
 			if ( $value ) {
-				//TODO: preprocess value
 				foreach ( $args as $data ) {
 					$this->print_single_style( $value, $data );
 				}
@@ -235,14 +297,14 @@ if ( ! class_exists( 'WPCD\CSSGenerator' ) ) {
 ?>
 <?php echo $data['media_query']; ?> {
 	<?php echo implode( ', ', $data['selectors'] ); ?> {
-		<?php echo $data['property']; ?>: <?php echo $data['prefix'] . $value . $data['suffix']; ?>
+		<?php echo $data['property']; ?>: <?php echo $data['prefix'] . $value . $data['suffix']; ?>;
 	}
 }
 <?php
 			} else {
 ?>
 <?php echo implode( ', ', $data['selectors'] ); ?> {
-	<?php echo $data['property']; ?>: <?php echo $data['prefix'] . $value . $data['suffix']; ?>
+	<?php echo $data['property']; ?>: <?php echo $data['prefix'] . $value . $data['suffix']; ?>;
 }
 <?php
 			}

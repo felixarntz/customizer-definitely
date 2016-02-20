@@ -9,6 +9,7 @@ namespace WPCD;
 
 use WPCD\App as App;
 use WPDLib\Components\Manager as ComponentManager;
+use WPDLib\FieldTypes\Manager as FieldManager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
@@ -45,6 +46,8 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 			return self::$instance;
 		}
 
+		private $_fields_cache = array();
+
 		/**
 		 * Class constructor.
 		 *
@@ -59,6 +62,7 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 		public function add_hooks() {
 			add_action( 'customize_register', array( $this, 'register_components' ), 10, 1 );
 			add_action( 'customize_preview_init', array( $this, 'enqueue_preview_assets' ), 10, 1 );
+			add_action( 'customize_controls_enqueue_scripts', array( $this, 'enqueue_control_assets' ) );
 		}
 
 		public function register_components( $wp_customize ) {
@@ -74,6 +78,7 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 					$section->register( $wp_customize, $panel );
 					foreach ( $section->get_children() as $field ) {
 						$field->register( $wp_customize, $section, $panel );
+						$this->_fields_cache[] = $field->_field;
 						if ( 'general' === $panel->slug ) {
 							add_action( 'update_option_' . $field->_id, array( $css_generator, 'set_last_modified' ) );
 						}
@@ -94,7 +99,7 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 				'util'					=> array(
 					'update_nonce'			=> wp_create_nonce( 'wpcd-customize-update' ),
 					'preprocess_nonce'		=> wp_create_nonce( 'wpcd-customize-preprocess' ),
-				);
+				),
 			) );
 
 			$main_dependencies = array( 'customize-base', 'wpcd-functions' );
@@ -107,6 +112,13 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 			}
 
 			wp_enqueue_script( 'wpcd-framework', App::get_url( 'assets/framework.js' ), $main_dependencies, App::get_info( 'version' ), true );
+		}
+
+		public function enqueue_control_assets() {
+			FieldManager::enqueue_assets( $this->_fields_cache );
+
+			wp_enqueue_script( 'wpcd-controls', App::get_url( 'assets/controls.js' ), array( 'wpdlib-fields', 'customize-controls' ), App::get_info( 'version' ), true );
+			wp_enqueue_style( 'wpcd-controls', App::get_url( 'assets/controls.css' ), array( 'wpdlib-fields' ), App::get_info( 'version' ) );
 		}
 
 		public function get_settings() {
@@ -177,7 +189,7 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 							$args['update_args'] = array( $args['update_args'] );
 						}
 						for ( $i = 0; $i < count( $args['update_args'] ); $i++ ) {
-							$args['update_args'][ $i ] = wp_parse_args( $args['update_args'][ $i ], array(
+							$args['update_args'][ $i ] = wp_parse_args( $args['update_args'][ $i ], array(
 								'selectors'		=> array(),
 								'property'		=> '',
 								'prefix'		=> '',
@@ -192,7 +204,7 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 							$args['update_args'] = array( $args['update_args'] );
 						}
 						for ( $i = 0; $i < count( $args['update_args'] ); $i++ ) {
-							$args['update_args'][ $i ] = wp_parse_args( $args['update_args'][ $i ], array(
+							$args['update_args'][ $i ] = wp_parse_args( $args['update_args'][ $i ], array(
 								'selectors'		=> array(),
 								'property'		=> '',
 								'prefix'		=> '',
@@ -207,29 +219,29 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 							if ( empty( $args['update_args'][ $i ]['media_query'] ) ) {
 								$media_query_parts = array();
 
-								if ( in_array( $args['update_args'][ $i ]['media_type'], array( 'all', 'print', 'screen', 'speech' ) ) ) {
-									$media_query_parts[] = 'only ' . $args['update_args'][ $i ]['media_type'];
+								if ( in_array( $args['update_args'][ $i ]['media_type'], array( 'all', 'print', 'screen', 'speech' ) ) ) {
+									$media_query_parts[] = 'only ' . $args['update_args'][ $i ]['media_type'];
 								}
 								if ( ! empty( $args['update_args'][ $i ]['min_width'] ) ) {
-									if ( is_numeric( $args['update_args'][ $i ]['min_width'] ) ) {
-										$args['update_args'][ $i ]['min_width'] .= 'px';
+									if ( is_numeric( $args['update_args'][ $i ]['min_width'] ) ) {
+										$args['update_args'][ $i ]['min_width'] .= 'px';
 									}
-									$media_query_parts[] = '(min-width: ' . $args['update_args'][ $i ]['min_width'] . ')';
+									$media_query_parts[] = '(min-width: ' . $args['update_args'][ $i ]['min_width'] . ')';
 								}
 								if ( ! empty( $args['update_args'][ $i ]['max_width'] ) ) {
-									if ( is_numeric( $args['update_args'][ $i ]['max_width'] ) ) {
-										$args['update_args'][ $i ]['max_width'] .= 'px';
+									if ( is_numeric( $args['update_args'][ $i ]['max_width'] ) ) {
+										$args['update_args'][ $i ]['max_width'] .= 'px';
 									}
-									$media_query_parts[] = '(max-width: ' . $args['update_args'][ $i ]['max_width'] . ')';
+									$media_query_parts[] = '(max-width: ' . $args['update_args'][ $i ]['max_width'] . ')';
 								}
 
 								if ( count( $media_query_parts ) > 0 ) {
 									$args['update_args'][ $i ]['media_query'] = '@media ' . implode( ' and ', $media_query_parts );
 								}
 							}
-							unset( $args['update_args'][ $i ]['media_type'] );
-							unset( $args['update_args'][ $i ]['min_width'] );
-							unset( $args['update_args'][ $i ]['max_width'] );
+							unset( $args['update_args'][ $i ]['media_type'] );
+							unset( $args['update_args'][ $i ]['min_width'] );
+							unset( $args['update_args'][ $i ]['max_width'] );
 						}
 						break;
 					default:
@@ -239,6 +251,12 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 
 			if ( $args['preprocess_callback'] ) {
 				switch ( $args['preprocess_callback'] ) {
+					case 'post_id_to_field':
+						$args['preprocess_args'] = wp_parse_args( $args['preprocess_args'], array(
+							'mode'		=> 'post',
+							'field'		=> 'title',
+						) );
+						break;
 					case 'get_attachment_url':
 						$args['preprocess_args'] = wp_parse_args( $args['preprocess_args'], array(
 							'size'		=> 'full',
@@ -273,7 +291,7 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 						break;
 					case 'value_to_label':
 						$args['preprocess_args'] = wp_parse_args( $args['preprocess_args'], array(
-							'mode'		=> 'label',
+							'mode'		=> 'value',
 							'labels'	=> $field->options,
 						) );
 						break;

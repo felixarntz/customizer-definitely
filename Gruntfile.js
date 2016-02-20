@@ -26,6 +26,9 @@ module.exports = function(grunt) {
 						' */',
 
 		clean: {
+			controls: [
+				'assets/controls.min.js'
+			],
 			framework: [
 				'assets/framework.min.js'
 			],
@@ -37,6 +40,11 @@ module.exports = function(grunt) {
 		jshint: {
 			options: {
 				jshintrc: 'assets/.jshintrc'
+			},
+			controls: {
+				src: [
+					'assets/controls.js'
+				]
 			},
 			framework: {
 				src: [
@@ -55,6 +63,10 @@ module.exports = function(grunt) {
 				preserveComments: 'some',
 				report: 'min'
 			},
+			controls: {
+				src: 'assets/controls.js',
+				dest: 'assets/controls.min.js'
+			},
 			framework: {
 				src: 'assets/framework.js',
 				dest: 'assets/framework.min.js'
@@ -69,6 +81,11 @@ module.exports = function(grunt) {
 			options: {
 				position: 'top',
 				banner: '<%= banner %>'
+			},
+			controls: {
+				src: [
+					'assets/controls.min.js'
+				]
 			},
 			framework: {
 				src: [
@@ -114,6 +131,12 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-banner');
 	grunt.loadNpmTasks('grunt-text-replace');
 
+	grunt.registerTask('controls', [
+		'clean:controls',
+		'jshint:controls',
+		'uglify:controls'
+	]);
+
 	grunt.registerTask('framework', [
 		'clean:framework',
 		'jshint:framework',
@@ -133,11 +156,13 @@ module.exports = function(grunt) {
 	]);
 
 	grunt.registerTask('default', [
+		'controls',
 		'framework',
 		'functions'
 	]);
 
 	grunt.registerTask('build', [
+		'controls',
 		'framework',
 		'functions',
 		'plugin'

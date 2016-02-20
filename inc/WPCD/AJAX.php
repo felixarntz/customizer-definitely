@@ -90,6 +90,15 @@ if ( ! class_exists( 'WPCD\AJAX' ) ) {
 			wp_send_json_success( $response );
 		}
 
+		public function manual_request( $action, $data ) {
+			$method_name = str_replace( '-', '_', str_replace( 'wpcd-', '', $action ) );
+			if ( ! method_exists( $this, $method_name ) ) {
+				return new WPError( 'invalid_action', __( 'Invalid action.', 'customizer-definitely' ) );
+			}
+
+			return $this->$method_name( $data );
+		}
+
 		private function post_id_to_field( $data ) {
 			if ( ! isset( $data['id'] ) ) {
 				return new WPError( 'missing_request_field', sprintf( __( 'Missing request field %s.', 'customizer-definitely' ), 'id' ) );

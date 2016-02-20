@@ -82,7 +82,9 @@
 	};
 
 	exports.update_setting = function( slug, callback, value, args ) {
-		callback.call( value, args, slug );
+		callback.call( undefined, value, args, slug );
 	};
+
+	exports.init();
 
 })( wpcd_customizer, wp );
