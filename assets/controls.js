@@ -24,7 +24,7 @@
 	});
 
 	api.WPDLibMediaControl = api.Control.extend({
-		/*ready: function() {
+		ready: function() {
 			var control = this;
 			var input = this.container.find( '.wpdlib-input-media' );
 
@@ -36,11 +36,16 @@
 					control.setting.set( '' );
 				}
 			});
-		}*/
+
+			this.setting.bind( function( value ) {
+				input.val( value );
+				input.wpMediaPicker( 'value', value );
+			});
+		}
 	});
 
 	api.WPDLibMapControl = api.Control.extend({
-		/*ready: function() {
+		ready: function() {
 			var control = this;
 			var input = this.container.find( '.wpdlib-input-map' );
 
@@ -49,7 +54,12 @@
 					control.setting.set( input.wpMapPicker( 'value' ) );
 				}
 			});
-		}*/
+
+			/*this.setting.bind( function( value ) {
+				input.val( value );
+				input.wpMapPicker( 'value', value );
+			});*/
+		}
 	});
 
 	api.controlConstructor.wpdlib_color = api.WPDLibColorControl;

@@ -27,7 +27,8 @@ module.exports = function(grunt) {
 
 		clean: {
 			controls: [
-				'assets/controls.min.js'
+				'assets/controls.min.js',
+				'assets/controls.min.css'
 			],
 			framework: [
 				'assets/framework.min.js'
@@ -77,6 +78,19 @@ module.exports = function(grunt) {
 			}
 		},
 
+		cssmin: {
+			options: {
+				compatibility: 'ie8',
+				keepSpecialComments: '*',
+				noAdvanced: true
+			},
+			controls: {
+				files: {
+					'assets/controls.min.css': 'assets/controls.css'
+				}
+			}
+		},
+
 		usebanner: {
 			options: {
 				position: 'top',
@@ -84,7 +98,8 @@ module.exports = function(grunt) {
 			},
 			controls: {
 				src: [
-					'assets/controls.min.js'
+					'assets/controls.min.js',
+					'assets/controls.min.css'
 				]
 			},
 			framework: {
@@ -128,13 +143,15 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-banner');
 	grunt.loadNpmTasks('grunt-text-replace');
 
 	grunt.registerTask('controls', [
 		'clean:controls',
 		'jshint:controls',
-		'uglify:controls'
+		'uglify:controls',
+		'cssmin:controls'
 	]);
 
 	grunt.registerTask('framework', [
