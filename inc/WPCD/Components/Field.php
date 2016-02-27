@@ -7,6 +7,7 @@
 
 namespace WPCD\Components;
 
+use WPCD\Utility as Utility;
 use WPCD\Customizer as Customizer;
 use WPDLib\Components\Manager as ComponentManager;
 use WPDLib\Components\Base as Base;
@@ -76,8 +77,8 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 				}
 			}
 
-			$setting_args['sanitize_callback'] = array( $this, 'validate_setting' );
-			$setting_args['sanitize_js_callback'] = array( $this, 'validate_setting' );
+			$setting_args['sanitize_callback'] = array( $this, 'sanitize_setting' );
+			$setting_args['sanitize_js_callback'] = array( $this, 'sanitize_setting' );
 
 			$control_args_map = array(
 				'title'					=> 'label',
@@ -121,25 +122,19 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 		}
 
 		/**
-		 * Validates the meta value for this field.
+		 * Sanitizes the customizer setting value for this field.
 		 *
 		 * @since 0.5.0
-		 * @param mixed $meta_value the new option value to validate
+		 * @param mixed $setting the setting value to sanitize
+		 * @param boolean $formatted whether to return automatically formatted values, ready for output (default is false)
 		 */
-		public function validate_setting( $setting = null ) {
-			//TODO: maybe figure out a way to show errors here
-			if ( $this->args['required'] ) {
-				if ( null === $setting || $this->_field->is_empty( $setting ) ) {
-					return null;
-					return new WPError( 'invalid_empty_value', __( 'No value was provided for the required field.', 'customizer-definitely' ) );
-				}
+		public function sanitize_setting( $setting = null, $formatted = false ) {
+			if ( null !== $setting ) {
+				$setting = $this->_field->parse( $setting, $formatted );
+			} else {
+				$setting = $this->_field->parse( $this->args['default'], $formatted );
 			}
-			$result = $this->_field->validate( $setting );
-			if ( is_wp_error( $result ) ) {
-				return null;
-				return $result;
-			}
-			return $result;
+			return $setting;
 		}
 
 		/**
@@ -163,9 +158,7 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 					unset( $this->args['priority'] );
 				}
 
-				if ( null !== $this->args['position'] ) {
-					$this->args['position'] = floatval( $this->args['position'] );
-				}
+				$this->args = Utility::validate_position_args( $this->args );
 
 				if ( null === $this->args['mode'] ) {
 					$this->args['mode'] = $parent->get_parent()->mode;

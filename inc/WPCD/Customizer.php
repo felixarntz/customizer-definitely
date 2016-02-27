@@ -91,7 +91,7 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 		}
 
 		public function enqueue_preview_assets( $wp_customize ) {
-			wp_enqueue_script( 'wpcd-functions', App::get_url( 'assets/functions.js' ), array( 'jquery', 'wp-util' ), App::get_info( 'version' ), true );
+			wp_enqueue_script( 'wpcd-functions', App::get_url( 'assets/functions.min.js' ), array( 'jquery', 'wp-util' ), App::get_info( 'version' ), true );
 			wp_localize_script( 'wpcd-functions', 'wpcd_customizer', array(
 				'settings'				=> $this->get_settings(),
 				'update_callbacks'		=> new \stdClass(),
@@ -111,14 +111,14 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 				$main_dependencies[] = $script_handle;
 			}
 
-			wp_enqueue_script( 'wpcd-framework', App::get_url( 'assets/framework.js' ), $main_dependencies, App::get_info( 'version' ), true );
+			wp_enqueue_script( 'wpcd-framework', App::get_url( 'assets/framework.min.js' ), $main_dependencies, App::get_info( 'version' ), true );
 		}
 
 		public function enqueue_control_assets() {
 			FieldManager::enqueue_assets( $this->_fields_cache );
 
-			wp_enqueue_script( 'wpcd-controls', App::get_url( 'assets/controls.js' ), array( 'wpdlib-fields', 'customize-controls' ), App::get_info( 'version' ), true );
-			wp_enqueue_style( 'wpcd-controls', App::get_url( 'assets/controls.css' ), array( 'wpdlib-fields' ), App::get_info( 'version' ) );
+			wp_enqueue_script( 'wpcd-controls', App::get_url( 'assets/controls.min.js' ), array( 'wpdlib-fields', 'customize-controls' ), App::get_info( 'version' ), true );
+			wp_enqueue_style( 'wpcd-controls', App::get_url( 'assets/controls.min.css' ), array( 'wpdlib-fields' ), App::get_info( 'version' ) );
 		}
 
 		public function get_settings() {

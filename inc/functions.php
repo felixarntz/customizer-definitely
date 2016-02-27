@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! function_exists( 'wpcd_get_customizer_settings' ) ) {
-	function wpcd_get_customizer_settings( $panel_slug ) {
+	function wpcd_get_customizer_settings( $panel_slug, $formatted = false ) {
 		$_options = array();
 		$_thememods = array();
 		if ( 'general' !== $panel_slug ) {
@@ -29,23 +29,13 @@ if ( ! function_exists( 'wpcd_get_customizer_settings' ) ) {
 			if ( 'general' === $panel_slug ) {
 				foreach ( $panel->get_children() as $section ) {
 					foreach ( $section->get_children() as $field ) {
-						//TODO: parse settings
-						if ( 'option' === $field->mode ) {
-							$settings[ $field->slug ] = get_option( $field->slug, null );
-						} else {
-							$settings[ $field->slug ] = get_theme_mod( $field->slug, null );
-						}
+						$settings[ $field->slug ] = \WPCD\Utility::parse_setting( ( 'option' === $field->mode ? get_option( $field->slug, null ) : get_theme_mod( $field->slug, null ) ), $field, $formatted );
 					}
 				}
 			} else {
 				foreach ( $panel->get_children() as $section ) {
 					foreach ( $section->get_children() as $field ) {
-						//TODO: parse settings
-						if ( 'option' === $field->mode ) {
-							$settings[ $field->slug ] = isset( $_options[ $field->slug ] ) ? $_options[ $field->slug ] : null;
-						} else {
-							$settings[ $field->slug ] = isset( $_thememods[ $field->slug ] ) ? $_thememods[ $field->slug ] : null;
-						}
+						$settings[ $field->slug ] = \WPCD\Utility::parse_setting( ( isset( $_options[ $field->slug ] ) ? $_options[ $field->slug ] : ( isset( $_thememods[ $field->slug ] ) ? $_thememods[ $field->slug ] : null ) ), $field, $formatted );
 					}
 				}
 			}
@@ -56,7 +46,7 @@ if ( ! function_exists( 'wpcd_get_customizer_settings' ) ) {
 }
 
 if ( ! function_exists( 'wpcd_get_customizer_setting' ) ) {
-	function wpcd_get_customizer_setting( $panel_slug, $field_slug ) {
+	function wpcd_get_customizer_setting( $panel_slug, $field_slug, $formatted = false ) {
 		if ( doing_action( 'wpcd' ) || ! did_action( 'wpcd' ) ) {
 			if ( 'general' === $panel_slug ) {
 				$setting = get_theme_mod( $field_slug, null );
@@ -78,20 +68,14 @@ if ( ! function_exists( 'wpcd_get_customizer_setting' ) ) {
 		$field = \WPDLib\Components\Manager::get( $panel_slug . '.*.' . $field_slug, 'WPCD\Components\Panel', true );
 		if ( $field ) {
 			if ( 'general' === $panel_slug ) {
-				//TODO: parse setting
-				if ( 'option' === $field->mode ) {
-					$setting = get_option( $field->slug, null );
-				} else {
-					$setting = get_theme_mod( $field->slug, null );
-				}
+				$setting = \WPCD\Utility::parse_setting( ( 'option' === $field->mode ? get_option( $field->slug, null ) : get_theme_mod( $field->slug, null ) ), $field, $formatted );
 			} else {
-				//TODO: parse setting
 				if ( 'option' === $field->mode ) {
 					$_options = get_option( $panel_slug, array() );
-					$setting = isset( $_options[ $field->slug ] ) ? $_options[ $field->slug ] : null;
+					$setting = \WPCD\Utility::parse_setting( ( isset( $_options[ $field->slug ] ) ? $_options[ $field->slug ] : null ), $field, $formatted );
 				} else {
 					$_thememods = get_theme_mod( $panel_slug, array() );
-					$setting = isset( $_thememods[ $field->slug ] ) ? $_thememods[ $field->slug ] : null;
+					$setting = \WPCD\Utility::parse_setting( ( isset( $_thememods[ $field->slug ] ) ? $_thememods[ $field->slug ] : null ), $field, $formatted );
 				}
 			}
 		}

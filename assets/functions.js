@@ -58,8 +58,6 @@
 		});
 	};
 
-	//TODO: implement AJAX PHP functions
-
 	exports.preprocess_callbacks.post_id_to_field = function( value, callback, args ) {
 		if ( ! value ) {
 			callback( '' );

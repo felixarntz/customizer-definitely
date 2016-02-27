@@ -10,6 +10,10 @@
 	z-index: 1000000;
 }
 
+.wp-mediapicker-content-wrap {
+	width: 100%;
+}
+
 .wp-mappicker-map-canvas-wrap {
 	position: relative;
 	width: 100%;

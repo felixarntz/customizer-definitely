@@ -16,7 +16,7 @@
 				}
 			});
 
-			this.setting.bind( function( value ) {
+			control.setting.bind( function( value ) {
 				input.val( value );
 				input.wpColorPicker( 'color', value );
 			});
@@ -37,10 +37,10 @@
 				}
 			});
 
-			this.setting.bind( function( value ) {
+			/*control.setting.bind( function( value ) {
 				input.val( value );
 				input.wpMediaPicker( 'value', value );
-			});
+			});*/
 		}
 	});
 
@@ -55,7 +55,11 @@
 				}
 			});
 
-			/*this.setting.bind( function( value ) {
+			api.section( control.section() ).container.on( 'expanded', function() {
+				input.wpMapPicker( 'refresh' );
+			});
+
+			/*control.setting.bind( function( value ) {
 				input.val( value );
 				input.wpMapPicker( 'value', value );
 			});*/

@@ -64,8 +64,6 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 
 			add_filter( 'wpcd_panel_validated', array( $this, 'panel_validated' ), 10, 2 );
 			add_filter( 'wpcd_section_validated', array( $this, 'section_validated' ), 10, 2 );
-
-			//TODO: generate wpcd-customizer.css file dynamically from all 'update_style' fields, auto-include like a normal stylesheet (use rewrites)
 		}
 
 		/**
@@ -135,8 +133,6 @@ if ( ! class_exists( 'WPCD\App' ) ) {
 				) ) );
 
 				do_action( 'wpcd', $this );
-
-				//TODO: hook into WPOD to create customizer panels from tabs
 			} else {
 				self::doing_it_wrong( __METHOD__, __( 'This function should never be called manually.', 'customizer-definitely' ), '0.5.0' );
 			}

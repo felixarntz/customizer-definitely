@@ -7,6 +7,7 @@
 
 namespace WPCD\Components;
 
+use WPCD\Utility as Utility;
 use WPDLib\Components\Base as Base;
 use WP_Customize_Section as WPCustomizeSection;
 
@@ -78,9 +79,7 @@ if ( ! class_exists( 'WPCD\Components\Section' ) ) {
 					unset( $this->args['priority'] );
 				}
 
-				if ( null !== $this->args['position'] ) {
-					$this->args['position'] = floatval( $this->args['position'] );
-				}
+				$this->args = Utility::validate_position_args( $this->args );
 			}
 
 			return $status;
