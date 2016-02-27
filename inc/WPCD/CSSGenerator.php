@@ -66,7 +66,7 @@ if ( ! class_exists( 'WPCD\CSSGenerator' ) ) {
 			if ( is_customize_preview() ) {
 				add_action( 'wp_head', array( $this, 'print_customizer_styles' ), 10, 0 );
 			} else {
-				add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_customizer_styles' ) );
+				add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_customizer_styles' ), 9999, 0 );
 			}
 		}
 
