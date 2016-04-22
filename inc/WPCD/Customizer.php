@@ -177,6 +177,7 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 				'timeout'				=> $default_timeout,
 				'preprocess_callback'	=> '',
 				'preprocess_args'		=> array(),
+				'selective_refresh'		=> array(),
 			) );
 
 			if ( $args['update_callback'] ) {
@@ -302,6 +303,13 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 						$args['preprocess_args'] = apply_filters( 'wpcd_validate_' . $args['preprocess_callback'] . '_preprocess_args', $args['preprocess_args'] );
 				}
 			}
+
+			$args['selective_refresh'] = wp_parse_args( $args['selective_refresh'], array(
+				'selector'				=> false,
+				'container_inclusive'	=> false,
+				'render_callback'		=> false,
+				'fallback_refresh'		=> true,
+			) );
 
 			return $args;
 		}

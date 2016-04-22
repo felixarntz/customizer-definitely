@@ -119,6 +119,10 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 
 			$wp_customize->add_control( new WPCustomizeControl( $wp_customize, $this->_id, $control_args, $this->_field ) );
 			$this->_control = $wp_customize->get_control( $this->_id );
+
+			if ( isset( $wp_customize->selective_refresh ) && $this->args['preview_args']['selective_refresh']['selector'] && $this->args['preview_args']['selective_refresh']['render_callback'] ) {
+				$wp_customize->selective_refresh->add_partial( $this->_id, $this->args['preview_args']['selective_refresh'] );
+			}
 		}
 
 		/**
