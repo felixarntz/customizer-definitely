@@ -133,6 +133,11 @@ if ( ! class_exists( 'WPCD\Components\Field' ) ) {
 		 * @param boolean $formatted whether to return automatically formatted values, ready for output (default is false)
 		 */
 		public function sanitize_setting( $setting = null, $formatted = false ) {
+			// fix for second filter parameter for `customize_sanitize_{setting_id}`
+			if ( ! is_bool( $formatted ) && is_a( $formatted, 'WP_Customize_Setting' ) ) {
+				$formatted = false;
+			}
+
 			if ( null !== $setting ) {
 				$setting = $this->_field->parse( $setting, $formatted );
 			} else {
