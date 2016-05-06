@@ -1,7 +1,7 @@
 === Customizer Definitely ===
 
 Plugin Name:       Customizer Definitely
-Plugin URI:        http://wordpress.org/plugins/customizer-definitely/
+Plugin URI:        https://github.com/felixarntz/customizer-definitely
 Author URI:        http://leaves-and-love.net
 Author:            Felix Arntz
 Donate link:       http://leaves-and-love.net/wordpress-plugins/

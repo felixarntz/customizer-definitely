@@ -22,7 +22,7 @@
     "email": "felix-arntz@leaves-and-love.net",
     "url": "http://leaves-and-love.net"
   },
-  "homepage": "http://wordpress.org/plugins/customizer-definitely/",
+  "homepage": "https://github.com/felixarntz/customizer-definitely",
   "repository": {
     "type": "git",
     "url": "git://github.com/felixarntz/customizer-definitely.git"

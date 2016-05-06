@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Customizer Definitely
-Plugin URI: http://wordpress.org/plugins/customizer-definitely/
+Plugin URI: https://github.com/felixarntz/customizer-definitely
 Description: This framework plugin makes adding customizer panels, sections and fields to WordPress very simple, yet flexible.
 Version: 0.5.0
 Author: Felix Arntz
