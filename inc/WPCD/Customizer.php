@@ -175,7 +175,7 @@ if ( ! class_exists( 'WPCD\Customizer' ) ) {
 				'update_callback'		=> '',
 				'update_args'			=> array(),
 				'timeout'				=> $default_timeout,
-				'preprocess_callback'	=> '',
+				'preprocess_callback'	=> $default_preprocess_callback,
 				'preprocess_args'		=> array(),
 				'selective_refresh'		=> array(),
 			) );

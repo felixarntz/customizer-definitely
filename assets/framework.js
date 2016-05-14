@@ -50,7 +50,7 @@
 	exports.bind_setting = function( setting_slug, update_callback, update_args, timeout, preprocess_callback, preprocess_args ) {
 		function preprocess_and_update( setting_value ) {
 			if ( preprocess_callback ) {
-				preprocess_callback.call( setting_value, function( val ) {
+				preprocess_callback.call( undefined, setting_value, function( val ) {
 					exports.update_setting( setting_slug, update_callback, val, update_args );
 				}, preprocess_args );
 			} else {

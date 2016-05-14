@@ -215,31 +215,31 @@ if ( ! class_exists( 'WPCD\CSSGenerator' ) ) {
 				case 'post_id_to_field':
 					if ( ! empty( $value ) ) {
 						$args['id'] = $value;
-						$preprocessed = AJAX::manual_request( 'wpcd-post-id-to-field', $args );
+						$preprocessed = AJAX::instance()->manual_request( 'wpcd-post-id-to-field', $args );
 					}
 					break;
 				case 'get_attachment_url':
 					if ( ! empty( $value ) ) {
 						$args['id'] = $value;
-						$preprocessed = AJAX::manual_request( 'wpcd-get-attachment-url', $args );
+						$preprocessed = AJAX::instance()->manual_request( 'wpcd-get-attachment-url', $args );
 					}
 					break;
 				case 'number_format_i18n':
 					if ( ! empty( $value ) ) {
 						$args['number'] = $value;
-						$preprocessed = AJAX::manual_request( 'wpcd-number-format-i18n', $args );
+						$preprocessed = AJAX::instance()->manual_request( 'wpcd-number-format-i18n', $args );
 					}
 					break;
 				case 'date_i18n':
 					if ( ! empty( $value ) ) {
 						$args['date'] = $value;
-						$preprocessed = AJAX::manual_request( 'wpcd-date-i18n', $args );
+						$preprocessed = AJAX::instance()->manual_request( 'wpcd-date-i18n', $args );
 					}
 					break;
 				case 'content_format':
 					if ( ! empty( $value ) ) {
 						$args['content'] = $value;
-						$preprocessed = AJAX::manual_request( 'wpcd-content-format', $args );
+						$preprocessed = AJAX::instance()->manual_request( 'wpcd-content-format', $args );
 					}
 					break;
 				case 'value_to_label':
