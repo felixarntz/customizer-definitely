@@ -1,20 +1,22 @@
 <?php
 /*
 Plugin Name: Customizer Definitely
-Plugin URI: https://github.com/felixarntz/customizer-definitely
+Plugin URI:  https://github.com/felixarntz/customizer-definitely
 Description: This framework plugin makes adding customizer panels, sections and fields to WordPress very simple, yet flexible.
-Version: 0.5.0
-Author: Felix Arntz
-Author URI: http://leaves-and-love.net
-License: GNU General Public License v3
+Version:     0.5.0
+Author:      Felix Arntz
+Author URI:  https://leaves-and-love.net
+License:     GNU General Public License v3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Text Domain: customizer-definitely
-Tags: wordpress, plugin, definitely, framework, library, developer, admin, backend, structured data, ui, api, cms, customizer
+Tags:        definitely, framework, admin, customizer, live refresh, selective refresh
 */
 /**
+ * Plugin initialization file
+ *
  * @package WPCD
- * @version 0.5.0
  * @author Felix Arntz <felix-arntz@leaves-and-love.net>
+ * @since 0.5.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

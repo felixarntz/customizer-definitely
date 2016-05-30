@@ -1,0 +1,36 @@
+/*!
+ * Customizer Definitely (https://github.com/felixarntz/customizer-definitely)
+ * By Felix Arntz (https://leaves-and-love.net)
+ * Licensed under GNU General Public License v3 (http://www.gnu.org/licenses/gpl-3.0.html)
+ */
+.select2-container {
+	width: 100% !important;
+}
+
+.select2-dropdown {
+	z-index: 1000000;
+}
+
+.ui-autocomplete {
+	z-index: 1000000;
+}
+
+.wp-mediapicker-content-wrap {
+	width: 100%;
+}
+
+.wp-mappicker-map-canvas-wrap {
+	position: relative;
+	width: 100%;
+	height: 0;
+	padding-bottom: 56.25%; 
+	margin-top: 10px;
+}
+
+.wp-mappicker-map-canvas {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	padding: 0 !important; 
+	margin: 0 !important;
+}

@@ -1,8 +1,10 @@
 <?php
 /**
+ * WPCD\App class
+ *
  * @package WPCD
- * @version 0.5.0
  * @author Felix Arntz <felix-arntz@leaves-and-love.net>
+ * @since 0.5.0
  */
 
 namespace WPCD;
