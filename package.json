@@ -25,11 +25,7 @@
   "bugs": {
     "url" : "https://github.com/felixarntz/customizer-definitely/issues"
   },
-  "license": {
-    "type": "GPL-3.0",
-    "name": "GNU General Public License v3",
-    "url": "http://www.gnu.org/licenses/gpl-3.0.html"
-  },
+  "license": "GPL-3.0",
   "engines": {
     "node": ">= 0.10.0"
   },
